@@ -1,0 +1,32 @@
+import Link from "next/link";
+
+/**
+ * A branded 404 with a way back, rather than the framework's default.
+ */
+export default function NotFound() {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center px-6">
+      <p className="font-mono text-sm text-[var(--accent)]">404</p>
+      <h1 className="hero-heading mt-4 max-w-[680px] text-5xl font-semibold tracking-tight">
+        Nothing at this table
+      </h1>
+      <p className="mt-6 max-w-[680px] text-lg text-[var(--text-dim)]">
+        The page you asked for does not exist. The games do.
+      </p>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <Link
+          href="/"
+          className="fluid rounded-lg bg-white px-3 py-2 text-base font-semibold text-black hover:bg-[var(--accent)]"
+        >
+          Back to molfi.fun
+        </Link>
+        <a
+          href="https://crewkill.molfi.fun"
+          className="fluid rounded-lg border border-[var(--line-2)] px-3 py-2 text-base font-semibold text-white hover:bg-[var(--surface)]"
+        >
+          Play CrewKill
+        </a>
+      </div>
+    </main>
+  );
+}

@@ -1,44 +1,44 @@
 import type { Metadata } from "next";
-import { Archivo_Black, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 /**
- * The hub inherits CrewKill's type system on purpose.
+ * One typeface, per the landing page system.
  *
- * molfi.fun and the games on it should read as one house, not as separate sites that happen
- * to link to each other. Same two typefaces, same tokens, same substrates.
+ * Geist carries everything. Geist Mono appears only where a number needs to line up
+ * with the number under it, which is the one case a monospace is doing real work.
  */
-const display = Archivo_Black({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-display-loaded",
-  display: "swap",
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono-loaded",
-  display: "swap",
-});
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "molfi.fun",
+  title: "molfi.fun — staked games settled on Starknet",
   description:
-    "Staked games settled on Starknet. Privacy is the mechanic, not a feature bolted on.",
+    "Games where privacy is the mechanic, not a feature. Buy in privately, play, and settle onchain where anyone can check the result afterwards.",
   metadataBase: new URL("https://molfi.fun"),
+  openGraph: {
+    title: "molfi.fun",
+    description:
+      "Games where privacy is the mechanic, not a feature. Settled onchain, checkable afterwards.",
+    url: "https://molfi.fun",
+    siteName: "molfi.fun",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "molfi.fun",
+    description: "Games where privacy is the mechanic, not a feature.",
+  },
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var s=localStorage.getItem("molfi.substrate");if(s==="phosphor"||s==="newsprint"){document.documentElement.dataset.substrate=s}}catch(e){}})()`,
-          }}
-        />
-      </head>
-      <body className={`${display.variable} ${mono.variable} min-h-screen antialiased`}>
+    <html lang="en">
+      <body className={`${geist.variable} ${geistMono.variable} min-h-screen`}>
+        <a href="#main" className="skip">
+          Skip to content
+        </a>
         {children}
       </body>
     </html>
