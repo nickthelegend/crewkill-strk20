@@ -120,6 +120,9 @@ panel is scoring privacy depth.)*
 87. Stall watchdog on phase progression. BUILT.
 88. Double-submit guards on reveal and claim. BUILT.
 89. Horizontal-overflow fix at narrow widths. BUILT.
+89a. Shipping metadata on both sites: favicon, open graph and Twitter cards, and a branded
+    404 with a way back. BUILT. The hub had these from its rebuild and CrewKill did not,
+    which is the kind of gap that only shows when someone shares a link.
 90. Deployment/chain-id verification at boot. BUILT.
 91. Abort-and-refund path for stalled matches. BUILT.
 92. Agent account lease pool. BUILT.

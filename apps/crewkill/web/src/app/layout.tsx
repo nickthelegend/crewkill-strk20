@@ -27,6 +27,20 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title:"CrewKill - molfi.fun",
   metadataBase: new URL("https://crewkill.molfi.fun"),
+  openGraph: {
+    title: "CrewKill",
+    description:
+      "Staked social deduction where the privacy is the mechanic. Buy a seat through the STRK20 pool, draw a role nobody can read, and settle onchain.",
+    url: "https://crewkill.molfi.fun",
+    siteName: "molfi.fun",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CrewKill",
+    description: "Staked social deduction where the privacy is the mechanic.",
+  },
+  icons: { icon: "/favicon.svg" },
   description:"Buy a seat privately, draw a role nobody can read, vote anonymously, and get paid for being right - settled on-chain through the STRK20 privacy pool.",
 };
 
