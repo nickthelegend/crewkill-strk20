@@ -144,6 +144,14 @@ Full protocol write-up: [`docs/PROTOCOL.md`](docs/PROTOCOL.md).
 
 ## Run it
 
+A fresh clone needs one build step first. The Cairo artifacts and the Prisma client are
+generated, so they are not in the tree:
+
+```bash
+pnpm install && pnpm setup
+```
+
+
 You need Docker, Node 24+, pnpm, and [Scarb + Starknet Foundry](https://github.com/software-mansion/starkup).
 
 ```bash

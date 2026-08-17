@@ -82,14 +82,34 @@ export function subscribe(
     socket.onclose = () => {
       onStatus?.(false);
       if (closed) return;
-      const delay = Math.min(30_000, 1000 * 2 ** attempt);
+      // Backoff caps at five seconds, not thirty.
+      //
+      // This is a live game: a phase lasts fifteen to sixty seconds, so a client that waits
+      // half a minute after the keeper returns has already missed a round. The cap is short
+      // enough that recovery is never worse than one phase, and the jitter keeps a room full
+      // of clients from all retrying on the same tick.
+      const base = Math.min(5_000, 500 * 2 ** attempt);
       attempt += 1;
-      retry = setTimeout(connect, delay);
+      retry = setTimeout(connect, base + Math.random() * 400);
     };
   };
   connect();
 
+  // Coming back to a backgrounded tab should retry immediately rather than serving out
+  // whatever backoff was pending when it was hidden.
+  const onWake = (): void => {
+    if (closed || document.visibilityState !== "visible") return;
+    if (socket && socket.readyState === WebSocket.OPEN) return;
+    if (retry) clearTimeout(retry);
+    attempt = 0;
+    connect();
+  };
+  document.addEventListener("visibilitychange", onWake);
+  window.addEventListener("online", onWake);
+
   return () => {
+    document.removeEventListener("visibilitychange", onWake);
+    window.removeEventListener("online", onWake);
     closed = true;
     if (retry) clearTimeout(retry);
     // Drop the handler first: closing deliberately must not schedule a reconnect.

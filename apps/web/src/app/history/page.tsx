@@ -3,7 +3,7 @@
 import { MatchPhase, type MatchView } from"@crewkill/protocol";
 import Link from"next/link";
 import { useCallback, useEffect, useState } from"react";
-import { Panel, Stat } from"@/components/pieces";
+import { Panel, Stat, SubstrateSwitch } from"@/components/pieces";
 import { IntegrityAudit } from"@/components/privacy";
 import { ChainLog } from"@/components/chainlog";
 import {
@@ -169,9 +169,15 @@ function Header() {
           Every match this deployment has played, still checkable.
         </p>
       </div>
-      <Link href="/" className="switch no-underline">
-        Back to the ship
-      </Link>
+      {/* The Archive is a surface in its own right, so it carries the same controls as the
+          console. Without these, someone who lands here from a link is stuck on whichever
+          substrate their system picked. */}
+      <div className="flex items-center gap-2">
+        <SubstrateSwitch />
+        <Link href="/" className="switch no-underline">
+          Back to the ship
+        </Link>
+      </div>
     </header>
   );
 }
