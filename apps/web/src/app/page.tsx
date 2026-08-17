@@ -70,6 +70,8 @@ export default function Home() {
   const [shieldedAt, setShieldedAt] = useState<number | null>(null);
   /** The meeting table. Opens on each voting phase; dismissible to watch the ship. */
   const [tableOpen, setTableOpen] = useState(false);
+  /** The log and chain feed. Collapsible, so the ship can be seen whole. */
+  const [feedOpen, setFeedOpen] = useState(true);
   const lastVotingRound = useRef<number | null>(null);
   /**
    * One-shot guards for the two actions that cannot be repeated on-chain.
@@ -505,9 +507,14 @@ export default function Home() {
     );
   }
 
-  // ── in play: the ship, with everything that reads it alongside ────────────────────
+  // ── in play: the ship IS the screen ───────────────────────────────────────────────
+  //
+  // The map used to sit in a box inside a document, with the page scrolling underneath and
+  // dead space below the fold. A game should own the viewport: the ship fills it, and
+  // everything that reads the ship floats on top. The HUD container ignores pointer events
+  // so the map stays draggable through the gaps; each panel opts back in.
   return (
-    <main className="mx-auto max-w-[110rem] px-4 py-4">
+    <>
       <Cutscenes match={match} />
 
       {tableOpen && seat !== null && (
@@ -522,129 +529,154 @@ export default function Home() {
           onClose={() => setTableOpen(false)}
         />
       )}
-      <Header
-        match={match}
-        live={live}
-        pool={pool}
-        config={config}
-        onConnect={() => void connect()}
-        compact
-      />
-      {error && <ErrorBar message={error} />}
-      {match.sabotage > 0 && (
-        <div className="mt-3">
-          <SabotageBanner match={match} />
-        </div>
-      )}
 
-      <div className="mt-4 grid min-w-0 gap-4 lg:grid-cols-[1fr_22rem]">
-        <div className="min-w-0 space-y-4">
-          <ShipView
-            // Remount per match: the view holds its own camera, and seat 0 of the next match
-            // is not seat 0 of this one.
-            key={match.matchId}
-            map={ship}
+      {/* The ship, edge to edge. */}
+      <div className="fixed inset-0 z-0">
+        <ShipView
+          key={match.matchId}
+          map={ship}
+          match={match}
+          yourSeat={yourSeat}
+          onRoomClick={(room) => {
+            if (!playing || match.roundPhase !== "night" || yourSeat === null) return;
+            if (!seatRow?.alive) return;
+            if (!(adjacencyOf(ship)[seatRow.location] ?? []).includes(room)) return;
+            void sendAction({ type: ActionType.Move, destination: room });
+          }}
+        />
+      </div>
+
+      <div className="pointer-events-none fixed inset-0 z-30 flex flex-col">
+        {/* Top: identity, phase, controls. */}
+        <div className="pointer-events-auto bg-[var(--color-hull)]/85 px-4 py-2.5 backdrop-blur">
+          <Header
             match={match}
-            yourSeat={yourSeat}
-            onRoomClick={(room) => {
-              if (!playing || match.roundPhase !=="night" || yourSeat === null) return;
-              if (!seatRow?.alive) return;
-              if (!(adjacencyOf(ship)[seatRow.location] ?? []).includes(room)) return;
-              void sendAction({ type: ActionType.Move, destination: room });
-            }}
+            live={live}
+            pool={pool}
+            config={config}
+            onConnect={() => void connect()}
+            compact
           />
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <Panel title="Log" weight="rail">
-              <EventLog match={match} />
-            </Panel>
-            <ChainLog match={match} config={config} />
-          </div>
         </div>
 
-        <div className="min-w-0 space-y-3">
-          <Panel title="Your seat">
-            {!seat ? (
-              <p className="text-[13px] text-[var(--color-dim)]">
-                You are spectating. The next lobby is your way in.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                <SeatSummary seat={seat} yourSeat={yourSeat} yourRole={yourRole} />
-                {playing && match.roundPhase ==="night" && yourSeat !== null && (
-                  <div className="border-t border-[var(--color-line)] pt-3">
-                    <ActionPanel
-                      match={match}
-                      yourSeat={yourSeat}
-                      role={yourRole}
-                      busy={busy !== null}
-                      onAction={(action) => void sendAction(action)}
-                    />
-                  </div>
-                )}
-                {match.phase === MatchPhase.Revealing &&
-                  !seatRow?.revealedRole &&
-                  sent.reveal !== match.matchId && (
-                    <button
-                      onClick={() => void reveal()}
-                      disabled={busy !== null}
-                      className="w-full  border border-[var(--color-amber)]/50 py-2 text-xs text-[var(--color-amber)] hover:bg-[var(--color-amber)]/10 disabled:opacity-40"
-                    >
-                      {busy ??"Publish role secret"}
-                    </button>
-                  )}
-                {match.phase === MatchPhase.Settled &&
-                  seatRow?.payout &&
-                  seatRow.payout !=="0" &&
-                  !seatRow.claimed &&
-                  sent.claim !== match.matchId && (
-                    <button
-                      onClick={() => void claim()}
-                      disabled={busy !== null}
-                      className="w-full  bg-[var(--color-signal)]/15 py-2 text-sm text-[var(--color-signal)] ring-1 ring-[var(--color-signal)]/40 hover:bg-[var(--color-signal)]/25 disabled:opacity-40"
-                    >
-                      {busy ?? `Claim ${seatRow.payout}`}
-                    </button>
-                  )}
-              </div>
-            )}
-          </Panel>
+        {error && (
+          <div className="pointer-events-auto px-4 pt-2">
+            <ErrorBar message={error} />
+          </div>
+        )}
+        {match.sabotage > 0 && (
+          <div className="pointer-events-auto px-4 pt-2">
+            <SabotageBanner match={match} />
+          </div>
+        )}
 
-          {playing && match.roundPhase === "voting" && seat !== null && !tableOpen && (
-            <Panel title="Vote" weight="rail">
-              <p className="mb-2 text-[12px] text-[var(--color-dim)]">
-                {seatRow?.alive
-                  ? "The crew is at the table."
-                  : "The crew is at the table. You are dead, so you can watch but not vote."}
-              </p>
-              <button onClick={() => setTableOpen(true)} className="switch switch-primary w-full">
-                {seatRow?.alive ? "Take your seat" : "Watch the vote"}
-              </button>
+        <div className="flex min-h-0 flex-1 items-start justify-end gap-3 p-3">
+          {/* Right: everything that reads the ship. Scrolls on its own so the map never
+              has to give up room for it. */}
+          <aside className="pointer-events-auto flex max-h-full w-[21rem] shrink-0 flex-col gap-2 overflow-y-auto bg-[var(--color-hull)]/85 p-3 backdrop-blur">
+            <Panel title="Your seat" weight="rail">
+              {!seat ? (
+                <p className="text-[13px] text-[var(--color-dim)]">
+                  You are spectating. The next lobby is your way in.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  <SeatSummary seat={seat} yourSeat={yourSeat} yourRole={yourRole} />
+                  {playing && match.roundPhase === "night" && yourSeat !== null && (
+                    <div className="border-t border-[var(--color-line)] pt-3">
+                      <ActionPanel
+                        match={match}
+                        yourSeat={yourSeat}
+                        role={yourRole}
+                        busy={busy !== null}
+                        onAction={(action) => void sendAction(action)}
+                      />
+                    </div>
+                  )}
+                  {match.phase === MatchPhase.Revealing &&
+                    !seatRow?.revealedRole &&
+                    sent.reveal !== match.matchId && (
+                      <button
+                        onClick={() => void reveal()}
+                        disabled={busy !== null}
+                        className="switch w-full"
+                      >
+                        {busy ?? "Publish role secret"}
+                      </button>
+                    )}
+                  {match.phase === MatchPhase.Settled &&
+                    seatRow?.payout &&
+                    seatRow.payout !== "0" &&
+                    !seatRow.claimed &&
+                    sent.claim !== match.matchId && (
+                      <button
+                        onClick={() => void claim()}
+                        disabled={busy !== null}
+                        className="switch switch-armed w-full"
+                      >
+                        {busy ?? `Claim ${seatRow.payout}`}
+                      </button>
+                    )}
+                </div>
+              )}
             </Panel>
-          )}
 
-          <Panel title="Ballots" weight="rail">
-            <BallotBoard match={match} />
-          </Panel>
+            {playing && match.roundPhase === "voting" && seat !== null && !tableOpen && (
+              <Panel title="Vote" weight="rail">
+                <p className="mb-2 text-[12px] text-[var(--color-dim)]">
+                  {seatRow?.alive
+                    ? "The crew is at the table."
+                    : "The crew is at the table. You are dead, so you can watch but not vote."}
+                </p>
+                <button onClick={() => setTableOpen(true)} className="switch switch-primary w-full">
+                  {seatRow?.alive ? "Take your seat" : "Watch the vote"}
+                </button>
+              </Panel>
+            )}
 
-          <Panel title="Pot" weight="rail">
-            <PotStats match={match} />
-          </Panel>
+            <Panel title="Ballots" weight="rail">
+              <BallotBoard match={match} />
+            </Panel>
 
-          {match.phase === MatchPhase.Settled && <DetectiveBreakdown match={match} />}
-          {(match.phase === MatchPhase.Settled || seat !== null) && (
-            <IntegrityAudit match={match} />
-          )}
-          {seat !== null && (
-            <PrivacyLedger match={match} seat={seat} shieldedAt={shieldedAt} />
+            <Panel title="Pot" weight="rail">
+              <PotStats match={match} />
+            </Panel>
+
+            {match.phase === MatchPhase.Settled && <DetectiveBreakdown match={match} />}
+            {(match.phase === MatchPhase.Settled || seat !== null) && (
+              <IntegrityAudit match={match} />
+            )}
+            {seat !== null && (
+              <PrivacyLedger match={match} seat={seat} shieldedAt={shieldedAt} />
+            )}
+          </aside>
+        </div>
+
+        {/* Bottom: the narrative and the chain, side by side, collapsible so the ship can
+            be seen whole when it matters. */}
+        <div className="pointer-events-auto">
+          <button
+            onClick={() => setFeedOpen(!feedOpen)}
+            className="switch ml-3 mb-1"
+            aria-expanded={feedOpen}
+          >
+            {feedOpen ? "Hide feed" : "Show feed"}
+          </button>
+          {feedOpen && (
+            <div className="grid max-h-[30vh] gap-3 overflow-y-auto bg-[var(--color-hull)]/85 p-3 backdrop-blur md:grid-cols-2">
+              <Panel title="Log" weight="rail">
+                <EventLog match={match} />
+              </Panel>
+              <ChainLog match={match} config={config} />
+            </div>
           )}
         </div>
       </div>
-    </main>
+    </>
   );
 }
 
-/** Match identity, phase, clock and wallet - the one row that is always on screen. */
+
 function Header({
   match,
   live,

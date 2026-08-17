@@ -69,7 +69,7 @@ export function ShipView({
 
   return (
     <div
-      className="relative select-none overflow-hidden  border border-[var(--color-line)]"
+      className="relative h-full w-full select-none overflow-hidden"
       style={{
         background:"radial-gradient(ellipse at center, var(--hull-map-near), var(--hull-map-far))",
       }}
@@ -90,7 +90,7 @@ export function ShipView({
     >
       <svg
         viewBox={`${-map.width / 2} ${-map.height / 2} ${map.width} ${map.height}`}
-        className="block h-[62vh] w-full cursor-grab active:cursor-grabbing"
+        className="block h-full w-full cursor-grab active:cursor-grabbing"
         role="img"
         aria-label={`${map.name}: ${match.seatsFilled} seats, showing where each is`}
       >
