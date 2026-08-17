@@ -21,7 +21,7 @@ import {
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 /** `cairo/target/dev` — the artefacts scarb just built, not a checked-in copy. */
-export const ARTIFACT_DIR = join(HERE, "..", "..", "..", "..", "cairo", "target", "dev");
+export const ARTIFACT_DIR = join(HERE, "..", "..", "..", "..", "..", "cairo", "target", "dev");
 
 export interface Artifact {
   sierra: Record<string, unknown>;

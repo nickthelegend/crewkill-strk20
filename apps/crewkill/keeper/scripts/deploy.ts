@@ -18,7 +18,7 @@ import { declareAndDeploy, contractAt, makeAccount, makeProvider, settle } from 
 loadEnv();
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const DEPLOYMENTS = join(HERE, "..", "..", "..", "deployments");
+const DEPLOYMENTS = join(HERE, "..", "..", "..", "..", "deployments");
 
 export interface DeploymentFile {
   network: string;

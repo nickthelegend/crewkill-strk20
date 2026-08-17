@@ -17,6 +17,8 @@
     "web:dev": "pnpm --filter @crewkill/web dev",
     "devnet:up": "docker compose up -d devnet postgres",
     "devnet:deploy": "pnpm --filter @crewkill/keeper deploy:devnet",
-    "setup": "scarb --manifest-path cairo/Scarb.toml build && pnpm --filter @crewkill/keeper exec prisma generate"
+    "setup": "scarb --manifest-path cairo/Scarb.toml build && pnpm --filter @crewkill/keeper exec prisma generate",
+    "dev:hub": "pnpm --filter @molfi/hub dev",
+    "dev:crewkill": "pnpm --filter @crewkill/web dev"
   }
 }

@@ -1,6 +1,7 @@
 packages:
   - "packages/*"
   - "apps/*"
+  - "apps/crewkill/*"
 onlyBuiltDependencies:
   - "@prisma/client"
   - "@prisma/engines"

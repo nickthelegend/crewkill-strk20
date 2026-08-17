@@ -13,7 +13,7 @@ import type { Account, Contract, RpcProvider } from "starknet";
 import { contractAt, settle } from "./client.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const DEPLOYMENTS = join(HERE, "..", "..", "..", "..", "deployments");
+const DEPLOYMENTS = join(HERE, "..", "..", "..", "..", "..", "deployments");
 
 export interface Deployment {
   network: string;

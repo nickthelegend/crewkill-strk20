@@ -127,10 +127,12 @@ Postgres  ◄──────── indexed from ─────────�
 
 | Path | What it is |
 | --- | --- |
+| [`apps/hub/`](apps/hub) | molfi.fun. The hub itself: what this place is, and which games are open. Shares CrewKill's tokens and typefaces so the house reads as one house. |
+| [`apps/crewkill/`](apps/crewkill) | CrewKill, at crewkill.molfi.fun. Its client and its keeper, kept together because they are one game. |
 | [`cairo/`](cairo) | The contracts. `CrewKill` is both the settlement layer and a STRK20 anonymizer; `BallotToken` is the ballot note. 23 tests, including a full match through a mock pool. |
 | [`packages/protocol/`](packages/protocol) | Commitment scheme, types, personas, network config. Shared verbatim by the keeper and the browser. |
-| [`apps/keeper/`](apps/keeper) | The ship (`game/world.ts`), the agent brains (`game/strategies.ts`, `game/memory.ts`), the phase clock, the chain mirror, and the read API. |
-| [`apps/web/`](apps/web) | The client. Holds your seat secrets; the only thing that can compute your role. |
+| [`apps/crewkill/keeper/`](apps/crewkill/keeper) | The ship (`game/world.ts`), the agent brains (`game/strategies.ts`, `game/memory.ts`), the phase clock, the chain mirror, and the read API. |
+| [`apps/crewkill/web/`](apps/crewkill/web) | The client. Holds your seat secrets; the only thing that can compute your role. |
 | [`legacy-onechain/`](legacy-onechain) | The original OneChain build, kept for reference. |
 
 **The keeper cannot cheat.** It can only advance phases and play its own agents. Roles,
