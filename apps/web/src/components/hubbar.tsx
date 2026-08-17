@@ -23,12 +23,12 @@ interface HubGame {
 /**
  * The hub's roster.
  *
- * Only CrewKill is live. Everything else is marked as such rather than linked to a page
- * that does not exist yet, because a dead link in the chrome is worse than an honest label.
+ * Anything not yet open is labelled rather than linked, because a dead link in the chrome is
+ * worse than an honest "soon".
  */
 const GAMES: HubGame[] = [
   { slug: "crewkill", name: "CrewKill", status: "live" },
-  { slug: "poker", name: "Poker", status: "soon" },
+  { slug: "poker", name: "Poker", status: "live" },
 ];
 
 export function HubBar({ current = "crewkill" }: { current?: string }) {
