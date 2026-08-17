@@ -643,12 +643,6 @@ export default function Home() {
             </Panel>
 
             {match.phase === MatchPhase.Settled && <DetectiveBreakdown match={match} />}
-            {(match.phase === MatchPhase.Settled || seat !== null) && (
-              <IntegrityAudit match={match} />
-            )}
-            {seat !== null && (
-              <PrivacyLedger match={match} seat={seat} shieldedAt={shieldedAt} />
-            )}
           </aside>
         </div>
 
@@ -663,11 +657,10 @@ export default function Home() {
             {feedOpen ? "Hide feed" : "Show feed"}
           </button>
           {feedOpen && (
-            <div className="grid max-h-[30vh] gap-3 overflow-y-auto bg-[var(--color-hull)]/85 p-3 backdrop-blur md:grid-cols-2">
+            <div className="max-h-[26vh] overflow-y-auto bg-[var(--color-hull)]/85 p-3 backdrop-blur">
               <Panel title="Log" weight="rail">
                 <EventLog match={match} />
               </Panel>
-              <ChainLog match={match} config={config} />
             </div>
           )}
         </div>

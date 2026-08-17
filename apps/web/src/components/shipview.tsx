@@ -35,26 +35,32 @@ export function ShipView({
   yourSeat: number | null;
   onRoomClick?: (roomId: number) => void;
 }) {
-  const [zoom, setZoom] = useState(1);
-  /** Camera centre, in map units. */
-  const [pan, setPan] = useState({ x: map.width / 2, y: map.height / 2 });
   const [box, setBox] = useState({ w: 1280, h: 800 });
-  const dragging = useRef<{ x: number; y: number } | null>(null);
   const shell = useRef<HTMLDivElement>(null);
 
   /*
-   * How much of the ship to show at once.
+   * The whole ship, framed once, and then left alone.
    *
-   * This is the thing that decides whether the game is playable. Fitting the whole hull
-   * into the viewport sounds reasonable and is wrong: a 4800-unit ship squeezed into
-   * 1280 pixels renders a 620-unit room as 165px, and every fixture inside it collapses
-   * into a dot. The original build drew 900x550 rooms at 0.4 zoom, so a room was about
-   * 360px on screen and you panned around a world far bigger than the window.
-   *
-   * So this shows a window roughly two rooms wide and lets you move it, rather than
-   * shrinking the ship until it fits.
+   * There were zoom buttons and drag-to-pan here. Both are gone: a player in a meeting
+   * should not be managing a camera, and a view that moves is a view you have to re-read.
+   * The frame comes from what the rooms actually occupy rather than the declared canvas,
+   * which is looser, so the ship fills the space it is given without anyone touching it.
    */
-  const SPAN = 2400;
+  const frame = useMemo(() => {
+    const xs = map.rooms.map((r) => r.x);
+    const ys = map.rooms.map((r) => r.y);
+    const x2 = map.rooms.map((r) => r.x + r.width);
+    const y2 = map.rooms.map((r) => r.y + r.height);
+    const pad = 220;
+    const minX = Math.min(...xs) - pad;
+    const minY = Math.min(...ys) - pad;
+    return {
+      x: minX,
+      y: minY,
+      w: Math.max(...x2) + pad - minX,
+      h: Math.max(...y2) + pad - minY,
+    };
+  }, [map]);
 
   const adjacency = useMemo(() => adjacencyOf(map), [map]);
   const vents = useMemo(() => ventsOf(map), [map]);
@@ -94,16 +100,6 @@ export function ShipView({
     return () => observer.disconnect();
   }, []);
 
-  // The camera follows your seat, and otherwise holds the middle of the hull.
-  useEffect(() => {
-    const target = me ? centreOf(map, me.location) : { x: map.width / 2, y: map.height / 2 };
-    setPan(target);
-  }, [me?.location, map]);
-
-  // Wider window means more ship and smaller rooms, so zoom divides it.
-  const viewW = SPAN / zoom;
-  const viewH = viewW * (box.h / Math.max(box.w, 1));
-
   const lightsOut = match.sabotage === 1;
 
   return (
@@ -113,29 +109,11 @@ export function ShipView({
       style={{
         background:"radial-gradient(ellipse at center, var(--hull-map-near), var(--hull-map-far))",
       }}
-      onPointerDown={(event) => {
-        dragging.current = { x: event.clientX, y: event.clientY };
-        (event.target as Element).setPointerCapture?.(event.pointerId);
-      }}
-      onPointerMove={(event) => {
-        if (!dragging.current) return;
-        // Convert pixel movement into map units so dragging tracks the cursor exactly.
-        const perPixel = viewW / Math.max(box.w, 1);
-        const dx = (event.clientX - dragging.current.x) * perPixel;
-        const dy = (event.clientY - dragging.current.y) * perPixel;
-        dragging.current = { x: event.clientX, y: event.clientY };
-        setPan((prev) => ({
-          x: clamp(prev.x - dx, 0, map.width),
-          y: clamp(prev.y - dy, 0, map.height),
-        }));
-      }}
-      onPointerUp={() => {
-        dragging.current = null;
-      }}
     >
       <svg
-        viewBox={`${pan.x - viewW / 2} ${pan.y - viewH / 2} ${viewW} ${viewH}`}
-        className="block h-full w-full cursor-grab active:cursor-grabbing"
+        viewBox={`${frame.x} ${frame.y} ${frame.w} ${frame.h}`}
+        preserveAspectRatio="xMidYMid meet"
+        className="block h-full w-full "
         role="img"
         aria-label={`${map.name}: ${match.seatsFilled} seats, showing where each is`}
       >
@@ -246,24 +224,8 @@ export function ShipView({
           </div>
           <div className="text-[10px] text-[var(--color-dim)]">{map.tagline}</div>
         </div>
-        <div className="pointer-events-auto flex gap-1">
-          {[["+", 1.25], ["−", 0.8]].map(([label, factor]) => (
-            <button
-              key={label as string}
-              onClick={() => setZoom((z) => clamp(z * (factor as number), 0.35, 3))}
-              className="h-7 w-7 border border-[var(--color-line)] bg-[var(--color-panel)] text-sm text-[var(--color-dim)] hover:bg-[var(--color-line)] hover:text-[var(--color-ink)]"
-            >
-              {label as string}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {reachable.length > 0 && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3 text-center text-[11px] text-[var(--color-dim)]">
-          Drag to look around. Click a lit room to move there.
-        </div>
-      )}
     </div>
   );
 }

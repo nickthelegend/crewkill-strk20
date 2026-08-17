@@ -4,6 +4,8 @@ import { MatchPhase, type MatchView } from"@crewkill/protocol";
 import Link from"next/link";
 import { useCallback, useEffect, useState } from"react";
 import { Panel, Stat } from"@/components/pieces";
+import { IntegrityAudit } from"@/components/privacy";
+import { ChainLog } from"@/components/chainlog";
 import {
   fetchConfig,
   fetchDisclosure,
@@ -145,7 +147,15 @@ export default function HistoryPage() {
         </ol>
       </Panel>
 
-      {selected && config && <MatchDetail match={selected} onClose={() => setSelected(null)} />}
+      {selected && config && (
+        <>
+          <MatchDetail match={selected} onClose={() => setSelected(null)} />
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <IntegrityAudit match={selected} />
+            <ChainLog match={selected} config={config} />
+          </div>
+        </>
+      )}
     </main>
   );
 }
