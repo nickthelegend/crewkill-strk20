@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+.next/
+dist/
+cairo/target/
+apps/keeper/devnet-accounts.json
+.DS_Store
+
+# Design skills installed for the redesign run. Vendored tooling, not project source.
+.agents/
