@@ -5,6 +5,15 @@ of drifting from it.
 
 ---
 
+## Where this lives
+
+CrewKill sits at **crewkill.molfi.fun**, one game on the molfi.fun hub. The hub bar is the
+thinnest thing on the page on purpose: it is wayfinding, not navigation. The game is the
+product, and chrome that competes with it for attention is worse than none.
+
+Games that are not open yet are labelled rather than linked. A dead link in the chrome is
+worse than an honest "soon".
+
 ## Design read
 
 > A live staked social-deduction game for crypto-literate players, with a tactical-telemetry
@@ -159,3 +168,24 @@ state, which §9.F permits.
 6. New animation: name the state it reports, or do not ship it.
 7. Reach for a component library only if the brief changes. This is native CSS on purpose;
    there is no design system whose defaults look like a ship console.
+
+
+## Anti-pattern detector
+
+The Impeccable detector runs over `apps` and `packages` and returns zero findings. What it
+caught and what was done:
+
+| Finding | Fix |
+| --- | --- |
+| Two-axis grid background on the page | Removed. The grid now exists only behind the ship, where it is describing a hull rather than decorating a document. |
+| Thick coloured side borders on cards (x2) | The legacy renderer that held them was dead code, imported nowhere. Deleted, 3,433 lines. |
+| Accent border on a rounded card | Same file, same deletion. |
+| Indigo gradient palette | Same file, same deletion. |
+
+Nothing was suppressed. Re-run it with:
+
+```bash
+npx impeccable detect apps packages
+```
+
+See PRODUCT.md for the full anti-reference list this project is held to.

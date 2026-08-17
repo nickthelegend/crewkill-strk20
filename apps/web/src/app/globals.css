@@ -144,11 +144,9 @@ body {
   font-size: 13px;
   line-height: 1.45;
   letter-spacing: 0.01em;
-  background:
-    linear-gradient(var(--scan) 1px, transparent 1px) 0 0 / 100% 3px,
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 32px 100%,
-    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 32px,
-    var(--hull);
+  /* Plain surface. A page-wide grid field reads as decoration; the ship carries its own,
+     where a blueprint grid is actually describing something. */
+  background: var(--hull);
   -webkit-font-smoothing: antialiased;
 }
 

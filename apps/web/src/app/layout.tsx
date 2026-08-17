@@ -1,6 +1,7 @@
 import type { Metadata } from"next";
 import { Archivo_Black, JetBrains_Mono } from"next/font/google";
 import"./globals.css";
+import { HubBar } from"@/components/hubbar";
 
 /**
  * Two typefaces, two extremes, nothing in between.
@@ -24,7 +25,8 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title:"CrewKill - staked social deduction on Starknet",
+  title:"CrewKill - molfi.fun",
+  metadataBase: new URL("https://crewkill.molfi.fun"),
   description:"Buy a seat privately, draw a role nobody can read, vote anonymously, and get paid for being right - settled on-chain through the STRK20 privacy pool.",
 };
 
@@ -50,7 +52,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <HubBar />
+        {children}
+      </body>
     </html>
   );
 }

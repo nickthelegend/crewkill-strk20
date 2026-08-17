@@ -13,3 +13,6 @@ apps/keeper/devnet-accounts.json
 
 # Vendored context, refetched with `curl -sL https://strk20-by-example.org/llms-full.txt`
 docs/strk20-reference.txt
+
+# Impeccable design tooling, vendored.
+.claude/skills/impeccable/
