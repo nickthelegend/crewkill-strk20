@@ -1,0 +1,50 @@
+{
+  "network": "devnet",
+  "chainId": "0x534e5f5345504f4c4941",
+  "rpcUrl": "http://127.0.0.1:5050/rpc",
+  "game": "0x5bcdc75036e5dbf5463383d2c1a546c95ebe74f74304a3509bc1a6bbf68f743",
+  "ballot": "0x6e1542dbdb5a82360dcf54976c817fdfce991f9aa21367c0ec607e57beeb7b8",
+  "pool": "0x40ac98acb422cea96d58df8d7c19f7eb71c5eaafd3a4ae5e8e7cedab6faae74",
+  "stakeToken": "0x6d160e987928a5712dcc4a12bb5fd34bdbbd7b548f23a8dce94805aafe97dc",
+  "owner": "0x34ba56f92265f0868c57d3fe72ecab144fc96f97954bbbc4252cef8e8a979ba",
+  "keeper": "0x34ba56f92265f0868c57d3fe72ecab144fc96f97954bbbc4252cef8e8a979ba",
+  "transactions": [
+    {
+      "kind": "declare:MockERC20",
+      "hash": "0x3d7a039a9221dccd325d71cfdaa0e07c9887c68b69eb058ff884b8fc55245f5"
+    },
+    {
+      "kind": "deploy:MockERC20",
+      "hash": "0x61dead44eb43301c6fbc8bc2604560e1e9f718f8ef733c2ff67499f2f5a479f"
+    },
+    {
+      "kind": "declare:MockPrivacyPool",
+      "hash": "0x5e25f10e2083eb537ef75a107025d7937bcce73a862f5f500f807827a884b48"
+    },
+    {
+      "kind": "deploy:MockPrivacyPool",
+      "hash": "0x3e7541ca0797fed50054f82a92a3ca9cb97d9d42fdb646e3aebff2edc9dc528"
+    },
+    {
+      "kind": "declare:BallotToken",
+      "hash": "0x6a14046f60e3ff7475461ec315397d6f65789eda75391baae7226ac7c06ea7d"
+    },
+    {
+      "kind": "deploy:BallotToken",
+      "hash": "0x4d40a5d9b64941b8c9604b9dae20f1bf5ae44f7b18663ee3d5d9f7936d190c6"
+    },
+    {
+      "kind": "declare:CrewKill",
+      "hash": "0x7f08b873cf37dfb3006715fb4ad0636bca2592a716bb8fe8922e764c42719d4"
+    },
+    {
+      "kind": "deploy:CrewKill",
+      "hash": "0x3ee376cb6257b09be604cbc0c1de4ba5564a9b69d92023a02d00a80c2aa3cb0"
+    },
+    {
+      "kind": "invoke:set_minter",
+      "hash": "0xe31cc45197da6decb06e81bfaa83fde31b830319d14518918bd9cc15dd9cd0"
+    }
+  ],
+  "deployedAt": "2026-08-17T08:11:55.667Z"
+}
