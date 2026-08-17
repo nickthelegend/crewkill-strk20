@@ -20,6 +20,10 @@ import { Crewmate, DeadBody } from"./sprite";
  * here reads from the `ShipMap` the keeper also uses for its rules, so a corridor you can
  * see is a corridor you can walk.
  */
+function clamp(value: number, low: number, high: number): number {
+  return Math.min(Math.max(value, low), high);
+}
+
 export function ShipView({
   map,
   match,
@@ -32,8 +36,25 @@ export function ShipView({
   onRoomClick?: (roomId: number) => void;
 }) {
   const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
+  /** Camera centre, in map units. */
+  const [pan, setPan] = useState({ x: map.width / 2, y: map.height / 2 });
+  const [box, setBox] = useState({ w: 1280, h: 800 });
   const dragging = useRef<{ x: number; y: number } | null>(null);
+  const shell = useRef<HTMLDivElement>(null);
+
+  /*
+   * How much of the ship to show at once.
+   *
+   * This is the thing that decides whether the game is playable. Fitting the whole hull
+   * into the viewport sounds reasonable and is wrong: a 4800-unit ship squeezed into
+   * 1280 pixels renders a 620-unit room as 165px, and every fixture inside it collapses
+   * into a dot. The original build drew 900x550 rooms at 0.4 zoom, so a room was about
+   * 360px on screen and you panned around a world far bigger than the window.
+   *
+   * So this shows a window roughly two rooms wide and lets you move it, rather than
+   * shrinking the ship until it fits.
+   */
+  const SPAN = 2400;
 
   const adjacency = useMemo(() => adjacencyOf(map), [map]);
   const vents = useMemo(() => ventsOf(map), [map]);
@@ -59,16 +80,35 @@ export function ShipView({
     return byRoom;
   }, [match.bodies]);
 
-  // Follow your own seat, and otherwise sit on the middle of the hull.
+  // Keep the window matched to the element, so the ship never stretches.
+  useEffect(() => {
+    const node = shell.current;
+    if (!node) return;
+    const measure = () => {
+      const r = node.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) setBox({ w: r.width, h: r.height });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  // The camera follows your seat, and otherwise holds the middle of the hull.
   useEffect(() => {
     const target = me ? centreOf(map, me.location) : { x: map.width / 2, y: map.height / 2 };
-    setPan({ x: -target.x, y: -target.y });
+    setPan(target);
   }, [me?.location, map]);
+
+  // Wider window means more ship and smaller rooms, so zoom divides it.
+  const viewW = SPAN / zoom;
+  const viewH = viewW * (box.h / Math.max(box.w, 1));
 
   const lightsOut = match.sabotage === 1;
 
   return (
     <div
+      ref={shell}
       className="relative h-full w-full select-none overflow-hidden"
       style={{
         background:"radial-gradient(ellipse at center, var(--hull-map-near), var(--hull-map-far))",
@@ -79,17 +119,22 @@ export function ShipView({
       }}
       onPointerMove={(event) => {
         if (!dragging.current) return;
-        const dx = (event.clientX - dragging.current.x) / zoom;
-        const dy = (event.clientY - dragging.current.y) / zoom;
+        // Convert pixel movement into map units so dragging tracks the cursor exactly.
+        const perPixel = viewW / Math.max(box.w, 1);
+        const dx = (event.clientX - dragging.current.x) * perPixel;
+        const dy = (event.clientY - dragging.current.y) * perPixel;
         dragging.current = { x: event.clientX, y: event.clientY };
-        setPan((prev) => ({ x: prev.x + dx * 2.4, y: prev.y + dy * 2.4 }));
+        setPan((prev) => ({
+          x: clamp(prev.x - dx, 0, map.width),
+          y: clamp(prev.y - dy, 0, map.height),
+        }));
       }}
       onPointerUp={() => {
         dragging.current = null;
       }}
     >
       <svg
-        viewBox={`${-map.width / 2} ${-map.height / 2} ${map.width} ${map.height}`}
+        viewBox={`${pan.x - viewW / 2} ${pan.y - viewH / 2} ${viewW} ${viewH}`}
         className="block h-full w-full cursor-grab active:cursor-grabbing"
         role="img"
         aria-label={`${map.name}: ${match.seatsFilled} seats, showing where each is`}
@@ -116,7 +161,7 @@ export function ShipView({
           </filter>
         </defs>
 
-        <g transform={`scale(${zoom}) translate(${pan.x} ${pan.y})`}>
+        <g>
           {/* Corridors first, so rooms sit on top of their joins. */}
           {map.corridors.map(([a, b]) => {
             const from = centreOf(map, a);
@@ -205,7 +250,7 @@ export function ShipView({
           {[["+", 1.25], ["−", 0.8]].map(([label, factor]) => (
             <button
               key={label as string}
-              onClick={() => setZoom((z) => Math.min(2.5, Math.max(0.45, z * (factor as number))))}
+              onClick={() => setZoom((z) => clamp(z * (factor as number), 0.35, 3))}
               className="h-7 w-7 border border-[var(--color-line)] bg-[var(--color-panel)] text-sm text-[var(--color-dim)] hover:bg-[var(--color-line)] hover:text-[var(--color-ink)]"
             >
               {label as string}
