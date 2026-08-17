@@ -308,3 +308,16 @@ body {
   /* The ejection still needs to end off-screen, just without the tumble. */
   .eject-float { animation: eject-float 3s steps(2, end) forwards; }
 }
+
+/* ── LOBBY AMBIENCE ───────────────────────────────────────────────────────────────
+   Crew drifting across the lobby while it fills. A lobby with nothing moving in it
+   reads as broken rather than waiting. Slow and few, so it stays ambience. */
+@keyframes walk-across {
+  from { transform: translateX(-12%); }
+  to   { transform: translateX(112vw); }
+}
+.walker { animation: walk-across linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .walker { display: none; }
+}

@@ -30,6 +30,8 @@ import { DetectiveBreakdown, IntegrityAudit, PrivacyLedger } from"@/components/p
 import { ChainLog, DeploymentCard } from"@/components/chainlog";
 import { ShipView } from"@/components/shipview";
 import { Cutscenes } from"@/components/cutscenes";
+import { VotingScreen } from"@/components/votingscreen";
+import { AgentCard, CrewProgress, WalkingCrew } from"@/components/roster";
 import { ActionType } from"@/lib/ship";
 import { API_URL, fetchConfig, fetchLobby, fetchMatch, subscribe, type ChainConfig } from"@/lib/api";
 import { createSeat, exportSeat, loadSeat, rememberSeatIndex } from"@/lib/seat";
@@ -66,6 +68,9 @@ export default function Home() {
   const [openLobby, setOpenLobby] = useState<MatchView | null>(null);
   /** When this browser shielded its stake - the input to the deposit/stake timing factor. */
   const [shieldedAt, setShieldedAt] = useState<number | null>(null);
+  /** The meeting table. Opens on each voting phase; dismissible to watch the ship. */
+  const [tableOpen, setTableOpen] = useState(false);
+  const lastVotingRound = useRef<number | null>(null);
   /**
    * One-shot guards for the two actions that cannot be repeated on-chain.
    *
@@ -441,7 +446,7 @@ export default function Home() {
             {Array.from({ length: match.seatCount }).map((_unused, i) => {
               const seatHere = match.seats[i];
               return seatHere ? (
-                <SeatCard key={i} seat={seatHere} isYou={i === yourSeat} votes={0} />
+                <AgentCard key={i} seat={seatHere} isYou={i === yourSeat} />
               ) : (
                 <div
                   key={i}
@@ -504,6 +509,19 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-[110rem] px-4 py-4">
       <Cutscenes match={match} />
+
+      {tableOpen && seat !== null && (
+        <VotingScreen
+          match={match}
+          yourSeat={yourSeat}
+          busy={busy !== null}
+          onVote={(target) => {
+            setTableOpen(false);
+            void castVote(target);
+          }}
+          onClose={() => setTableOpen(false)}
+        />
+      )}
       <Header
         match={match}
         live={live}
@@ -592,28 +610,15 @@ export default function Home() {
             )}
           </Panel>
 
-          {canVote && (
+          {playing && match.roundPhase === "voting" && seat !== null && !tableOpen && (
             <Panel title="Vote" weight="rail">
-              <div className="grid grid-cols-2 gap-2">
-                {match.seats
-                  .filter((s) => s.alive && s.index !== yourSeat)
-                  .map((s) => (
-                    <button
-                      key={s.index}
-                      onClick={() => void castVote(s.index)}
-                      disabled={busy !== null}
-                      className="border border-[var(--color-line)] px-2 py-1.5 text-[11px] hover:border-[var(--color-cyan)] hover:text-[var(--color-cyan)] disabled:opacity-40"
-                    >
-                      {s.emoji} {s.persona}
-                    </button>
-                  ))}
-              </div>
-              <button
-                onClick={() => void castVote(NO_TARGET)}
-                disabled={busy !== null}
-                className="mt-2 w-full  border border-[var(--color-line)] py-1.5 text-[11px] text-[var(--color-dim)] hover:text-[var(--color-ink)] disabled:opacity-40"
-              >
-                skip this vote
+              <p className="mb-2 text-[12px] text-[var(--color-dim)]">
+                {seatRow?.alive
+                  ? "The crew is at the table."
+                  : "The crew is at the table. You are dead, so you can watch but not vote."}
+              </p>
+              <button onClick={() => setTableOpen(true)} className="switch switch-primary w-full">
+                {seatRow?.alive ? "Take your seat" : "Watch the vote"}
               </button>
             </Panel>
           )}
@@ -760,7 +765,7 @@ function PotStats({ match }: { match: MatchView }) {
         <Stat label="Impostor draw" value={`${match.impostorBps / 100}%`} />
       </div>
       <div className="mt-4">
-        <TaskProgress match={match} />
+        <CrewProgress match={match} />
       </div>
     </>
   );
