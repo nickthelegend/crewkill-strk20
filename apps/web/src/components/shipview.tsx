@@ -20,6 +20,29 @@ import { Crewmate, DeadBody } from"./sprite";
  * here reads from the `ShipMap` the keeper also uses for its rules, so a corridor you can
  * see is a corridor you can walk.
  */
+/**
+ * A corridor that only ever runs horizontally or vertically.
+ *
+ * Straight when the two rooms share a row or a column, which the grid makes the common
+ * case. Otherwise it turns once, going along the longer axis first so the elbow lands away
+ * from the room it is leaving rather than immediately outside its door.
+ */
+function corridorPath(
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+): string {
+  const dx = Math.abs(to.x - from.x);
+  const dy = Math.abs(to.y - from.y);
+  const ALIGNED = 30;
+
+  if (dx <= ALIGNED) return `M ${from.x} ${from.y} L ${from.x} ${to.y}`;
+  if (dy <= ALIGNED) return `M ${from.x} ${from.y} L ${to.x} ${from.y}`;
+
+  return dx >= dy
+    ? `M ${from.x} ${from.y} L ${to.x} ${from.y} L ${to.x} ${to.y}`
+    : `M ${from.x} ${from.y} L ${from.x} ${to.y} L ${to.x} ${to.y}`;
+}
+
 function clamp(value: number, low: number, high: number): number {
   return Math.min(Math.max(value, low), high);
 }
@@ -140,41 +163,22 @@ export function ShipView({
         </defs>
 
         <g>
-          {/* Corridors first, so rooms sit on top of their joins. */}
+          {/* Corridors, routed on the square.
+              Rooms sit on a grid, so a connected pair usually shares a row or a column and
+              the run between them is simply straight. Where it does not, the corridor turns
+              once at a right angle rather than cutting across the hull on a diagonal, which
+              is what made runs cross each other. */}
           {map.corridors.map(([a, b]) => {
             const from = centreOf(map, a);
             const to = centreOf(map, b);
+            const d = corridorPath(from, to);
             return (
-              <g key={`c-${a}-${b}`}>
-                {/* Hull bed, then the walls, then the deck, then the markings. Four passes
-                    is what makes a corridor read as a built thing rather than a line. */}
-                <line
-                  x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                  stroke="var(--corridor-shell)" strokeWidth={138} strokeLinecap="round"
-                />
-                <line
-                  x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                  stroke="var(--corridor-wall)" strokeWidth={124} strokeLinecap="round"
-                />
-                <line
-                  x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                  stroke="var(--corridor-deck)" strokeWidth={108} strokeLinecap="round"
-                />
-                {/* Deck grating, running across the corridor. */}
-                <line
-                  x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                  stroke="url(#grating)" strokeWidth={108} strokeLinecap="butt"
-                />
-                {/* Hazard edging along both walls. */}
-                <line
-                  x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                  stroke="var(--corridor-edge)" strokeWidth={96} strokeDasharray="26 22"
-                  opacity={0.5} fill="none"
-                />
-                <line
-                  x1={from.x} y1={from.y} x2={to.x} y2={to.y}
-                  stroke="#e8b23a" strokeWidth={4} strokeDasharray="52 40" opacity={0.42}
-                />
+              <g key={`c-${a}-${b}`} fill="none" strokeLinecap="butt" strokeLinejoin="miter">
+                <path d={d} stroke="var(--corridor-shell)" strokeWidth={138} />
+                <path d={d} stroke="var(--corridor-wall)" strokeWidth={124} />
+                <path d={d} stroke="var(--corridor-deck)" strokeWidth={108} />
+                <path d={d} stroke="url(#grating)" strokeWidth={108} />
+                <path d={d} stroke="#e8b23a" strokeWidth={4} strokeDasharray="52 40" opacity={0.42} />
               </g>
             );
           })}

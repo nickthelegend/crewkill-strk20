@@ -84,15 +84,15 @@ const OBSIDIAN: ShipMap = {
   id: "obsidian",
   name: "Obsidian Prime",
   tagline: "A mining hauler with too many corridors and not enough witnesses.",
-  width: 5043,
-  height: 3200,
+  width: 5850,
+  height: 3330,
   space: { near: "#141b2c", far: "#05060a" },
   spawnRoom: 0,
   securityRoom: 7,
   cameraRooms: [0, 2, 4, 8],
   rooms: [
     {
-      id: 0, name: "Cafeteria", x: 2128, y: 120, width: 900, height: 620,
+      id: 0, name: "Cafeteria", x: 2470, y: 140, width: 900, height: 620,
       wall: "#4a5568", floor: "#5a6578", pattern: "tile", hasTasks: false,
       fixtures: [
         { kind: "table", x: 250, y: 200, w: 400, h: 180 },
@@ -102,7 +102,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 1, name: "Admin", x: 2275, y: 900, width: 560, height: 460,
+      id: 1, name: "Admin", x: 2640, y: 1460, width: 560, height: 460,
       wall: "#5a4a6a", floor: "#6a5a7a", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "console", x: 180, y: 120, w: 220, h: 120 },
@@ -111,7 +111,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 2, name: "Storage", x: 2128, y: 1560, width: 900, height: 620,
+      id: 2, name: "Storage", x: 1230, y: 1380, width: 900, height: 620,
       wall: "#6a5a3a", floor: "#7a6a4a", pattern: "grate", hasTasks: true,
       fixtures: [
         { kind: "crate", x: 100, y: 120, w: 110, h: 110 },
@@ -121,7 +121,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 3, name: "Electrical", x: 954, y: 2400, width: 620, height: 520,
+      id: 3, name: "Electrical", x: 1370, y: 2670, width: 620, height: 520,
       wall: "#6a6a3a", floor: "#5a5a2e", pattern: "hazard", hasTasks: true,
       fixtures: [
         { kind: "wiring", x: 80, y: 100, w: 160, h: 200 },
@@ -131,7 +131,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 4, name: "MedBay", x: 1012, y: 120, width: 620, height: 520,
+      id: 4, name: "MedBay", x: 1370, y: 190, width: 620, height: 520,
       wall: "#3a5a4a", floor: "#4a6a5a", pattern: "smooth", hasTasks: true,
       fixtures: [
         { kind: "medpod", x: 90, y: 140, w: 130, h: 220 },
@@ -141,7 +141,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 5, name: "Upper Engine", x: 123, y: 120, width: 600, height: 520,
+      id: 5, name: "Upper Engine", x: 140, y: 190, width: 600, height: 520,
       wall: "#5a3a3a", floor: "#6a4a4a", pattern: "grate", hasTasks: true,
       fixtures: [
         { kind: "engine", x: 120, y: 110, w: 340, h: 280 },
@@ -149,7 +149,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 6, name: "Lower Engine", x: 123, y: 2400, width: 600, height: 520,
+      id: 6, name: "Lower Engine", x: 140, y: 1430, width: 600, height: 520,
       wall: "#5a3a3a", floor: "#6a4a4a", pattern: "grate", hasTasks: true,
       fixtures: [
         { kind: "engine", x: 120, y: 110, w: 340, h: 280 },
@@ -157,7 +157,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 7, name: "Security", x: 120, y: 1300, width: 560, height: 460,
+      id: 7, name: "Security", x: 160, y: 2700, width: 560, height: 460,
       wall: "#3a4a6a", floor: "#44557a", pattern: "plate", hasTasks: false,
       fixtures: [
         { kind: "camera", x: 150, y: 90, w: 260, h: 150 },
@@ -166,7 +166,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 8, name: "Reactor", x: 120, y: 750, width: 560, height: 460,
+      id: 8, name: "Reactor", x: 2640, y: 2700, width: 560, height: 460,
       wall: "#6a3a3a", floor: "#7a4a4a", pattern: "hazard", hasTasks: true,
       fixtures: [
         { kind: "reactor", x: 160, y: 110, w: 240, h: 240 },
@@ -174,7 +174,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 9, name: "Weapons", x: 3374, y: 120, width: 620, height: 520,
+      id: 9, name: "Weapons", x: 3850, y: 190, width: 620, height: 520,
       wall: "#4a4a6a", floor: "#5a5a7a", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "console", x: 160, y: 130, w: 300, h: 160 },
@@ -182,7 +182,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 10, name: "Navigation", x: 4295, y: 800, width: 620, height: 520,
+      id: 10, name: "Navigation", x: 5090, y: 810, width: 620, height: 520,
       wall: "#3a5a6a", floor: "#4a6a7a", pattern: "smooth", hasTasks: true,
       fixtures: [
         { kind: "console", x: 150, y: 120, w: 320, h: 180 },
@@ -190,7 +190,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 11, name: "Shields", x: 3374, y: 1560, width: 620, height: 520,
+      id: 11, name: "Shields", x: 3850, y: 1430, width: 620, height: 520,
       wall: "#5a5a3a", floor: "#6a6a4a", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "console", x: 180, y: 140, w: 260, h: 140 },
@@ -198,7 +198,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 12, name: "O2", x: 4403, y: 1560, width: 520, height: 440,
+      id: 12, name: "O2", x: 5140, y: 1470, width: 520, height: 440,
       wall: "#3a6a5a", floor: "#4a7a6a", pattern: "smooth", hasTasks: true,
       fixtures: [
         { kind: "oxygen", x: 90, y: 110, w: 100, h: 220 },
@@ -206,7 +206,7 @@ const OBSIDIAN: ShipMap = {
       ],
     },
     {
-      id: 13, name: "Communications", x: 2106, y: 2500, width: 620, height: 460,
+      id: 13, name: "Communications", x: 3850, y: 2700, width: 620, height: 460,
       wall: "#4a3a5a", floor: "#5a4a6a", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "server", x: 90, y: 110, w: 110, h: 240 },
@@ -231,15 +231,15 @@ const KUIPER: ShipMap = {
   id: "kuiper",
   name: "Kuiper Relay",
   tagline: "A relay station built as a ring. There is always another way round.",
-  width: 4530,
-  height: 3020,
+  width: 5260,
+  height: 3300,
   space: { near: "#101a24", far: "#03060a" },
   spawnRoom: 0,
   securityRoom: 6,
   cameraRooms: [1, 3, 5, 7],
   rooms: [
     {
-      id: 0, name: "Hub", x: 1815, y: 1101, width: 900, height: 700,
+      id: 0, name: "Hub", x: 1870, y: 1300, width: 900, height: 700,
       wall: "#40506a", floor: "#4e5f7c", pattern: "tile", hasTasks: false,
       fixtures: [
         { kind: "table", x: 300, y: 260, w: 300, h: 180 },
@@ -249,7 +249,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 1, name: "North Dock", x: 1915, y: 120, width: 700, height: 520,
+      id: 1, name: "North Dock", x: 1970, y: 150, width: 700, height: 520,
       wall: "#3a5a6a", floor: "#48697a", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "console", x: 200, y: 130, w: 300, h: 150 },
@@ -257,7 +257,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 2, name: "Cryo Bay", x: 3290, y: 411, width: 640, height: 520,
+      id: 2, name: "Cryo Bay", x: 3240, y: 770, width: 640, height: 520,
       wall: "#3a6a64", floor: "#478079", pattern: "smooth", hasTasks: true,
       fixtures: [
         { kind: "medpod", x: 90, y: 120, w: 120, h: 240 },
@@ -266,7 +266,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 3, name: "East Array", x: 3770, y: 1154, width: 640, height: 560,
+      id: 3, name: "East Array", x: 4480, y: 1370, width: 640, height: 560,
       wall: "#4a4a72", floor: "#5a5a86", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "server", x: 90, y: 110, w: 110, h: 260 },
@@ -275,7 +275,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 4, name: "Fuel Cells", x: 3290, y: 1945, width: 640, height: 540,
+      id: 4, name: "Fuel Cells", x: 3240, y: 2620, width: 640, height: 540,
       wall: "#6a5230", floor: "#7d6340", pattern: "hazard", hasTasks: true,
       fixtures: [
         { kind: "oxygen", x: 80, y: 110, w: 110, h: 250 },
@@ -285,7 +285,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 5, name: "South Dock", x: 1915, y: 2280, width: 700, height: 500,
+      id: 5, name: "South Dock", x: 1970, y: 2640, width: 700, height: 500,
       wall: "#3a5a6a", floor: "#48697a", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "console", x: 200, y: 120, w: 300, h: 150 },
@@ -294,7 +294,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 6, name: "Watch Post", x: 551, y: 1945, width: 620, height: 540,
+      id: 6, name: "Watch Post", x: 150, y: 2620, width: 620, height: 540,
       wall: "#3a4a6a", floor: "#455680", pattern: "plate", hasTasks: false,
       fixtures: [
         { kind: "camera", x: 160, y: 100, w: 300, h: 170 },
@@ -303,7 +303,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 7, name: "West Array", x: 120, y: 1154, width: 640, height: 560,
+      id: 7, name: "West Array", x: 140, y: 1370, width: 640, height: 560,
       wall: "#4a4a72", floor: "#5a5a86", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "server", x: 100, y: 110, w: 110, h: 260 },
@@ -311,7 +311,7 @@ const KUIPER: ShipMap = {
       ],
     },
     {
-      id: 8, name: "Reactor Ring", x: 552, y: 409, width: 640, height: 540,
+      id: 8, name: "Reactor Ring", x: 140, y: 140, width: 640, height: 540,
       wall: "#6a3438", floor: "#7d4247", pattern: "hazard", hasTasks: true,
       fixtures: [
         { kind: "reactor", x: 190, y: 130, w: 260, h: 260 },
@@ -338,15 +338,15 @@ const DEEPCORE: ShipMap = {
   id: "deepcore",
   name: "Deep Core",
   tagline: "Three decks, two lifts. Nowhere to be that nobody can account for.",
-  width: 5057,
-  height: 3554,
+  width: 4650,
+  height: 3940,
   space: { near: "#1a1410", far: "#070403" },
   spawnRoom: 0,
   securityRoom: 4,
   cameraRooms: [0, 3, 6, 8],
   rooms: [
     {
-      id: 0, name: "Surface Dock", x: 1952, y: 120, width: 900, height: 560,
+      id: 0, name: "Surface Dock", x: 1810, y: 140, width: 900, height: 560,
       wall: "#4a4a52", floor: "#5b5b64", pattern: "tile", hasTasks: false,
       fixtures: [
         { kind: "table", x: 280, y: 220, w: 340, h: 160 },
@@ -355,7 +355,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 1, name: "Upper Lift", x: 120, y: 795, width: 460, height: 420,
+      id: 1, name: "Upper Lift", x: 170, y: 830, width: 460, height: 420,
       wall: "#3f4a5a", floor: "#4d5b6e", pattern: "plate", hasTasks: false,
       fixtures: [
         { kind: "console", x: 130, y: 120, w: 200, h: 120 },
@@ -363,7 +363,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 2, name: "Assay Lab", x: 1953, y: 838, width: 700, height: 520,
+      id: 2, name: "Assay Lab", x: 1910, y: 1400, width: 700, height: 520,
       wall: "#3a6058", floor: "#48756c", pattern: "smooth", hasTasks: true,
       fixtures: [
         { kind: "medpod", x: 100, y: 130, w: 130, h: 230 },
@@ -371,7 +371,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 3, name: "Ore Sorting", x: 4108, y: 836, width: 780, height: 560,
+      id: 3, name: "Ore Sorting", x: 3730, y: 760, width: 780, height: 560,
       wall: "#6a5a34", floor: "#7d6c42", pattern: "grate", hasTasks: true,
       fixtures: [
         { kind: "crate", x: 90, y: 110, w: 120, h: 120 },
@@ -382,7 +382,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 4, name: "Shaft Watch", x: 151, y: 1537, width: 520, height: 460,
+      id: 4, name: "Shaft Watch", x: 140, y: 1430, width: 520, height: 460,
       wall: "#3a4a6a", floor: "#455680", pattern: "plate", hasTasks: false,
       fixtures: [
         { kind: "camera", x: 130, y: 90, w: 260, h: 160 },
@@ -390,7 +390,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 5, name: "Drill Head", x: 2014, y: 1718, width: 820, height: 620,
+      id: 5, name: "Drill Head", x: 1230, y: 1970, width: 820, height: 620,
       wall: "#6a3a30", floor: "#7d493d", pattern: "hazard", hasTasks: true,
       fixtures: [
         { kind: "engine", x: 200, y: 150, w: 420, h: 320 },
@@ -399,7 +399,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 6, name: "Coolant", x: 4257, y: 1720, width: 680, height: 560,
+      id: 6, name: "Coolant", x: 3780, y: 2000, width: 680, height: 560,
       wall: "#3a5a6a", floor: "#48697d", pattern: "plate", hasTasks: true,
       fixtures: [
         { kind: "oxygen", x: 100, y: 120, w: 110, h: 250 },
@@ -408,7 +408,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 7, name: "Lower Lift", x: 120, y: 2469, width: 460, height: 420,
+      id: 7, name: "Lower Lift", x: 170, y: 2070, width: 460, height: 420,
       wall: "#3f4a5a", floor: "#4d5b6e", pattern: "plate", hasTasks: false,
       fixtures: [
         { kind: "console", x: 130, y: 120, w: 200, h: 120 },
@@ -416,7 +416,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 8, name: "Core Reactor", x: 2014, y: 2694, width: 820, height: 620,
+      id: 8, name: "Core Reactor", x: 1850, y: 2590, width: 820, height: 620,
       wall: "#6a3438", floor: "#7d4247", pattern: "hazard", hasTasks: true,
       fixtures: [
         { kind: "reactor", x: 260, y: 160, w: 300, h: 300 },
@@ -424,7 +424,7 @@ const DEEPCORE: ShipMap = {
       ],
     },
     {
-      id: 9, name: "Deep Store", x: 4257, y: 2696, width: 680, height: 560,
+      id: 9, name: "Deep Store", x: 3780, y: 3240, width: 680, height: 560,
       wall: "#5a4a3a", floor: "#6d5b48", pattern: "grate", hasTasks: true,
       fixtures: [
         { kind: "crate", x: 90, y: 120, w: 120, h: 120 },
