@@ -1,0 +1,164 @@
+/**
+ * Read models for the client.
+ *
+ * These are assembled from the mirror in Postgres, but every field that decides money
+ * (`payout`, `claimed`, `isImpostor`, `crewWon`) is written there only after being read back
+ * off the contract. Nothing in this file computes an outcome.
+ */
+
+import { NO_TARGET, type MatchView, type SeatView } from "@crewkill/protocol";
+import { prisma } from "../db.js";
+import { activeDeploymentId } from "./scope.js";
+import type { CrewKillContract } from "../chain/crewkill.js";
+import { shipMapById, shipMapForSeed } from "@crewkill/protocol";
+import { SABOTAGE_CONFIG, locationName } from "../game/ship.js";
+
+export async function buildMatchView(
+  dbId: number,
+  game: CrewKillContract,
+): Promise<MatchView | null> {
+  const row = await prisma.match.findUnique({
+    where: { id: dbId },
+    include: {
+      seats: { orderBy: { index: "asc" } },
+      events: { orderBy: { id: "asc" }, take: 400 },
+      txs: { orderBy: { id: "desc" }, take: 60 },
+    },
+  });
+  if (!row) return null;
+
+  // Which ship this match is on falls out of `final_seed`, exactly like roles and personas —
+  // so the map is not the operator's choice either.
+  const map = row.finalSeed ? shipMapForSeed(BigInt(row.finalSeed)) : shipMapById("obsidian");
+
+  const seats: SeatView[] = row.seats.map((seat) => ({
+    index: seat.index,
+    location: seat.location,
+    locationName: locationName(map, seat.location),
+    tasksCompleted: seat.tasksCompleted,
+    totalTasks: seat.totalTasks,
+    onCameras: seat.onCameras,
+    persona: seat.persona,
+    emoji: seat.emoji,
+    isAgent: seat.isAgent,
+    alive: seat.alive,
+    eliminatedRound: seat.eliminatedRound,
+    eliminatedBy: (seat.eliminatedBy as "vote" | "kill" | null) ?? null,
+    revealedRole: seat.revealed ? (seat.isImpostor ? "impostor" : "crew") : null,
+    roleSecret: seat.revealed ? seat.roleSecret : null,
+    claimed: seat.claimed,
+    payout: seat.payout,
+  }));
+
+  // Tallies come straight off the contract: they are the only vote data that exists, and
+  // they are counts, never attributions.
+  const tallies: MatchView["tallies"] = [];
+  const onchainId = Number(row.onchainId);
+  const upTo = row.roundsPlayed > 0 ? row.roundsPlayed : row.round;
+  for (let round = 1; round <= upTo; round += 1) {
+    const targets: Array<{ seat: number; votes: number }> = [];
+    for (const seat of row.seats) {
+      const votes = await game.getTally(onchainId, round, seat.index);
+      if (votes > 0) targets.push({ seat: seat.index, votes });
+    }
+    const skips = await game.getTally(onchainId, round, NO_TARGET);
+    if (skips > 0) targets.push({ seat: NO_TARGET, votes: skips });
+    if (targets.length > 0) tallies.push({ round, targets });
+  }
+
+  return {
+    matchId: onchainId,
+    phase: row.phase,
+    roundPhase: (row.roundPhase as MatchView["roundPhase"]) ?? null,
+    round: row.round,
+    rounds: row.rounds,
+    seatCount: row.seatCount,
+    seatsFilled: row.seatsFilled,
+    stakeAmount: row.stakeAmount,
+    potAmount: row.potAmount,
+    impostorBps: row.impostorBps,
+    detectiveBps: row.detectiveBps,
+    protocolBps: row.protocolBps,
+    seedCommitment: row.seedCommitment,
+    finalSeed: row.finalSeed,
+    crewWon: row.crewWon,
+    impostorCount: row.impostorCount,
+    detectiveWeightTotal: row.detectiveWeightTotal,
+    seats,
+    tallies,
+    events: row.events.map((event) => ({
+      id: String(event.id),
+      round: event.round,
+      at: event.createdAt.toISOString(),
+      kind: event.kind as MatchView["events"][number]["kind"],
+      text: event.text,
+      seat: event.seat ?? undefined,
+      target: event.target ?? undefined,
+    })),
+    mapId: map.id,
+    mapName: map.name,
+    sabotage: row.sabotage,
+    sabotageName: row.sabotage ? (SABOTAGE_CONFIG[row.sabotage]?.name ?? null) : null,
+    sabotageEndsAt: row.sabotageEndsAt?.toISOString() ?? null,
+    // Bodies are derived from the seats the chain already knows are dead, so the map and
+    // the settlement can never disagree about who is lying where.
+    //
+    // `reported` drives whether the body is still lying on the floor for people to find. A
+    // kill from an earlier round has been through a meeting and is accounted for; a kill
+    // from the round in progress has not, so it is still out there to be stumbled over.
+    bodies: row.seats
+      .filter((seat) => !seat.alive && seat.eliminatedBy === "kill")
+      .map((seat) => ({
+        victim: seat.index,
+        location: seat.location,
+        round: seat.eliminatedRound ?? 0,
+        reported: (seat.eliminatedRound ?? 0) < row.round,
+      })),
+    taskProgress: taskProgressOf(row.seats),
+    phaseEndsAt: row.phaseEndsAt?.toISOString() ?? null,
+    txHashes: row.txs.map((tx) => ({
+      kind: tx.kind,
+      hash: tx.hash,
+      at: tx.createdAt.toISOString(),
+    })),
+  };
+}
+
+/** Crew task completion across the roster, 0..1. */
+function taskProgressOf(
+  seats: Array<{ tasksCompleted: number; totalTasks: number }>,
+): number {
+  const total = seats.reduce((sum, seat) => sum + seat.totalTasks, 0);
+  if (total === 0) return 0;
+  const done = seats.reduce((sum, seat) => sum + seat.tasksCompleted, 0);
+  return Math.min(1, done / total);
+}
+
+export async function listMatches(network: string): Promise<
+  Array<{
+    dbId: number;
+    matchId: number;
+    phase: number;
+    seatsFilled: number;
+    seatCount: number;
+    stakeAmount: string;
+    potAmount: string;
+    phaseEndsAt: string | null;
+  }>
+> {
+  const rows = await prisma.match.findMany({
+    where: { deploymentId: await activeDeploymentId(network) },
+    orderBy: { id: "desc" },
+    take: 25,
+  });
+  return rows.map((row) => ({
+    dbId: row.id,
+    matchId: Number(row.onchainId),
+    phase: row.phase,
+    seatsFilled: row.seatsFilled,
+    seatCount: row.seatCount,
+    stakeAmount: row.stakeAmount,
+    potAmount: row.potAmount,
+    phaseEndsAt: row.phaseEndsAt?.toISOString() ?? null,
+  }));
+}
