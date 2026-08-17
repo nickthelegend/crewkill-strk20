@@ -31,10 +31,19 @@ import { ChainLog, DeploymentCard } from"@/components/chainlog";
 import { ShipView } from"@/components/shipview";
 import { Cutscenes } from"@/components/cutscenes";
 import { Primer, PrimerButton } from"@/components/primer";
+import { MainMenu } from"@/components/mainmenu";
 import { VotingScreen } from"@/components/votingscreen";
 import { AgentCard, CrewProgress, WalkingCrew } from"@/components/roster";
 import { ActionType } from"@/lib/ship";
-import { API_URL, fetchConfig, fetchLobby, fetchMatch, subscribe, type ChainConfig } from"@/lib/api";
+import {
+  API_URL,
+  fetchConfig,
+  fetchLobby,
+  fetchMatch,
+  fetchMatches,
+  subscribe,
+  type ChainConfig,
+} from"@/lib/api";
 import { createSeat, exportSeat, loadSeat, rememberSeatIndex } from"@/lib/seat";
 import {
   DevnetPool,
@@ -67,6 +76,7 @@ export default function Home() {
   const [live, setLive] = useState(false);
   /** A joinable lobby that is not the match currently on screen. */
   const [openLobby, setOpenLobby] = useState<MatchView | null>(null);
+  const [allMatches, setAllMatches] = useState<Array<{ matchId: number; phase: number; seatsFilled: number }>>([]);
   /** When this browser shielded its stake - the input to the deposit/stake timing factor. */
   const [shieldedAt, setShieldedAt] = useState<number | null>(null);
   /** The meeting table. Opens on each voting phase; dismissible to watch the ship. */
@@ -160,6 +170,8 @@ export default function Home() {
       if (pollingRef.current) return;
       pollingRef.current = true;
       try {
+        // Keeps the landing metrics honest: they count real matches, not a guess.
+        void fetchMatches().then(setAllMatches).catch(() => {});
         const lobby = await fetchLobby();
         const current = matchIdRef.current;
         const staked = current !== null && loadSeat(current) !== null;
@@ -435,16 +447,28 @@ export default function Home() {
   // ── lobby: no ship yet, so keep it a simple card ───────────────────────────────────
   if (inLobby) {
     return (
-      <main className="mx-auto max-w-3xl px-5 py-10">
+      <main className="min-h-screen">
         <Primer />
-        <Header
-          match={match}
-          live={live}
-          pool={pool}
-          config={config}
-          onConnect={() => void connect()}
-        />
-        {error && <ErrorBar message={error} />}
+        <div className="mx-auto max-w-3xl px-5 pt-5">
+          <Header
+            match={match}
+            live={live}
+            pool={pool}
+            config={config}
+            onConnect={() => void connect()}
+            wordmark={false}
+          />
+          {error && <ErrorBar message={error} />}
+        </div>
+
+        <MainMenu
+          lobby={match}
+          matches={allMatches}
+          connected={live}
+          onPlay={() => {
+            document.getElementById("seat")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        >
         <Panel title="The ship" className="mt-4">
           <div className="grid gap-3 sm:grid-cols-2">
             {Array.from({ length: match.seatCount }).map((_unused, i) => {
@@ -462,7 +486,7 @@ export default function Home() {
             })}
           </div>
         </Panel>
-        <Panel title="Your seat" className="mt-4">
+        <Panel title="Your seat" className="mt-4" id="seat">
           {!seat ? (
             <div className="space-y-3">
               <p className="text-[13px] text-[var(--color-dim)]">
@@ -505,6 +529,7 @@ export default function Home() {
             <ChainLog match={match} config={config} />
           </div>
         </div>
+        </MainMenu>
       </main>
     );
   }
@@ -680,6 +705,7 @@ function Header({
   config,
   onConnect,
   compact = false,
+  wordmark = true,
 }: {
   match: MatchView;
   live: boolean;
@@ -687,20 +713,26 @@ function Header({
   config: ChainConfig;
   onConnect: () => void;
   compact?: boolean;
+  /** The landing screen shows the logo image, so the text wordmark would repeat it. */
+  wordmark?: boolean;
 }) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h1 className={`macro ${compact ?"macro-sm" :"macro-lg"}`}>
-          CrewKill
-          <span className="numeric ml-[0.3em] text-[var(--color-dim)]">
-            #{match.matchId}
-          </span>
-        </h1>
-        {!compact && (
-          <p className="text-xs text-[var(--color-dim)]">
-            Staked social deduction, settled on-chain through the STRK20 privacy pool.
-          </p>
+        {wordmark && (
+          <>
+            <h1 className={`macro ${compact ?"macro-sm" :"macro-lg"}`}>
+              CrewKill
+              <span className="numeric ml-[0.3em] text-[var(--color-dim)]">
+                #{match.matchId}
+              </span>
+            </h1>
+            {!compact && (
+              <p className="text-xs text-[var(--color-dim)]">
+                Staked social deduction, settled on-chain through the STRK20 privacy pool.
+              </p>
+            )}
+          </>
         )}
       </div>
       <div className="flex flex-wrap items-center gap-2">

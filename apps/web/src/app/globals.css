@@ -321,3 +321,39 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .walker { display: none; }
 }
+
+/* ── LANDING ──────────────────────────────────────────────────────────────────────
+   Crew drifting behind the logo, and the one control that opens the game. Slow and
+   few: this is the first thing anyone sees, so it should feel alive without asking
+   for attention. */
+@keyframes drift-l { from { transform: translateX(-15vw); } to { transform: translateX(105vw); } }
+@keyframes drift-r { from { transform: translateX(105vw) scaleX(-1); } to { transform: translateX(-15vw) scaleX(-1); } }
+
+.drift-left  { animation: drift-l 42s linear infinite; opacity: 0.5; }
+.drift-right { animation: drift-r 58s linear infinite; opacity: 0.35; }
+
+/* The one button on the page earns more weight than a switch. */
+.menu-cta {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  padding: 0.85rem 2.4rem;
+  border: 2px solid var(--cyan);
+  background: var(--cyan);
+  color: var(--hull);
+  cursor: pointer;
+  transition: background 130ms linear, color 130ms linear;
+}
+.menu-cta:hover:not(:disabled) { background: transparent; color: var(--cyan); }
+.menu-cta:active:not(:disabled) { transform: translateY(1px); }
+.menu-cta:disabled {
+  border-color: var(--etch-2);
+  background: transparent;
+  color: var(--dim);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift-left, .drift-right { animation: none; opacity: 0.28; }
+}

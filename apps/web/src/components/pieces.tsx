@@ -20,19 +20,22 @@ export function Panel({
   children,
   className ="",
   weight ="primary",
+  id,
 }: {
   title?: string;
   right?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
   weight?:"primary" |"rail" |"inline";
+  /** For anchoring: the landing screen scrolls to a panel by id. */
+  id?: string;
 }) {
   const shell =
     weight ==="primary" ?"frame" : weight ==="rail" ?"rail" :"readout";
   const pad = weight ==="primary" ?"p-4" : weight ==="rail" ?"pt-3" :"";
 
   return (
-    <section className={`min-w-0 ${shell} ${className}`}>
+    <section id={id} className={`min-w-0 ${shell} ${className}`}>
       {title && (
         <header
           className={`flex items-baseline justify-between gap-3 ${
