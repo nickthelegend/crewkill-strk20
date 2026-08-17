@@ -30,6 +30,7 @@ import { DetectiveBreakdown, IntegrityAudit, PrivacyLedger } from"@/components/p
 import { ChainLog, DeploymentCard } from"@/components/chainlog";
 import { ShipView } from"@/components/shipview";
 import { Cutscenes } from"@/components/cutscenes";
+import { Primer, PrimerButton } from"@/components/primer";
 import { VotingScreen } from"@/components/votingscreen";
 import { AgentCard, CrewProgress, WalkingCrew } from"@/components/roster";
 import { ActionType } from"@/lib/ship";
@@ -435,6 +436,7 @@ export default function Home() {
   if (inLobby) {
     return (
       <main className="mx-auto max-w-3xl px-5 py-10">
+        <Primer />
         <Header
           match={match}
           live={live}
@@ -515,6 +517,7 @@ export default function Home() {
   // so the map stays draggable through the gaps; each panel opts back in.
   return (
     <>
+      <Primer />
       <Cutscenes match={match} />
 
       {tableOpen && seat !== null && (
@@ -708,6 +711,7 @@ function Header({
             reconnecting
           </span>
         )}
+        <PrimerButton />
         <a href="/history" className="switch no-underline">
           Archive
         </a>
@@ -773,9 +777,62 @@ function SeatSummary({
         <textarea
           readOnly
           value={exportSeat(seat)}
+          onFocus={(event) => event.currentTarget.select()}
           className="mt-2 h-24 w-full  border border-[var(--color-line)] bg-[var(--color-hull)] p-2 text-[11px]"
         />
+        <SeatBackupActions seat={seat} />
       </details>
+    </div>
+  );
+}
+
+/**
+ * Getting the seat secret somewhere safe.
+ *
+ * This is the only thing that can claim a payout. If it is lost the money is unreachable -
+ * not by us, not by anyone. A read-only textarea you have to select by hand is a poor way to
+ * treat that, so this offers a copy and a real file, and says plainly what it is for.
+ */
+function SeatBackupActions({ seat }: { seat: SeatKeypair }) {
+  const [copied, setCopied] = useState(false);
+
+  const download = () => {
+    const blob = new Blob([exportSeat(seat)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `crewkill-seat-${seat.matchId}.json`;
+    link.click();
+    // Revoking immediately can cancel the download in some browsers.
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+
+  return (
+    <div className="mt-2">
+      <div className="flex gap-2">
+        <button
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(exportSeat(seat));
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            } catch {
+              // Clipboard can be refused; the textarea above is still selectable.
+              setCopied(false);
+            }
+          }}
+          className="switch flex-1"
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
+        <button onClick={download} className="switch flex-1">
+          Download
+        </button>
+      </div>
+      <p className="mt-2 text-[11px] leading-relaxed text-[var(--color-dim)]">
+        This is the only thing that can claim your payout. It is held in this browser and
+        nowhere else, so clearing site data without a copy loses the money permanently.
+      </p>
     </div>
   );
 }

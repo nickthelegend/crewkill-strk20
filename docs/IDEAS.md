@@ -25,7 +25,8 @@ Status: **BUILT** verified working · **PARTIAL** working with a stated limit ·
 | 7 | Mainnet deployment + three pool transactions in `strk20.json` | The literal prize requirement | BLOCKED — real money, user's call |
 | 8 | **On-chain ledger** — every transaction with human labels and real explorer links | Makes "this is really on-chain" legible in a 3-minute video. Verified live with 8 transactions | BUILT |
 | 9 | **Privacy ledger** — per-seat panel of exactly what is public vs hidden about *you*, right now | The clearest possible articulation of the thesis | BUILT |
-| 10 | Demo mode — deterministic seeded match for recording | Removes luck from the demo video | SKIPPED — phase-length env vars already give this |
+| 10 | Demo mode - deterministic seeded match for recording | Removes luck from the demo video | SKIPPED - phase-length env vars already give this |
+| 10a | **First-run primer** - three cards teaching what the game is and what is hidden versus public | The largest gap in the whole project. A judge landing mid-match saw a ship and panels and was never told that the privacy is the mechanic. Verified: fires once, three cards, remembered, reopenable | BUILT |
 
 ## Tier 2 — strong, build if time
 
@@ -40,7 +41,7 @@ Status: **BUILT** verified working · **PARTIAL** working with a stated limit ·
 | 17 | Spectator mode with seat-follow camera | Map already supports click-to-follow | PARTIAL — inherited |
 | 18 | Agent personality cards on hover | Nice, not load-bearing | SKIPPED |
 | 19 | Match history page with outcomes | Persistence proof — 25 matches, 19 settled, openable to a per-seat breakdown | BUILT |
-| 20 | Seat-secret export/import as a file | Money-loss prevention | PARTIAL — clipboard export exists |
+| 20 | Seat-secret export as a file | Money-loss prevention: this is the only thing that can claim a payout, and it lives in one browser. Copy, download and a plain warning. Verified in a live seat | BUILT |
 | 21 | "Your ballot is unlinkable" proof panel | Educational | BUILT (folded into #9) |
 | 22 | Pool fee display read from `get_fee_amount` | WITHDRAWN — no such entrypoint exists in the STRK20 interface. I invented it when drafting this list; building against it would have meant inventing the value too | WITHDRAWN |
 | 23 | Gas/fee estimate before staking | Prevents a failed signature | SKIPPED — devnet fees are meaningless |
