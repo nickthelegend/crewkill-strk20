@@ -142,3 +142,44 @@ persistence, **F** honestly untestable here.
 | F2 | Human seat purchase on Sepolia or mainnet | Needs a real privacy wallet driven by a person |
 | F3 | Mainnet deployment | Spends real money |
 | F4 | `demo_url` detection | Needs a public deployment |
+
+
+---
+
+## Execution record
+
+Run against devnet (a real Starknet chain), Postgres, keeper on `:8080`, client on `:3100`,
+driven through a real browser. Sepolia items run against the live deployment.
+
+| Section | Result |
+| --- | --- |
+| A contracts | **10/10** via 39 `snforge` tests |
+| B HTTP API | **14/14** |
+| C WebSocket | **4/4** |
+| D client | **41/42**, D26 partially observed |
+| E chain and persistence | **8/8**, plus Sepolia 8/9 |
+| F untestable here | 4 items, stated rather than skipped quietly |
+
+### Failures found and fixed during this run
+
+1. **D38 - no substrate switch on the Archive.** The console had it, the Archive did not, so
+   anyone arriving there from a link could not change substrate at all. The Archive now
+   carries the same controls. Re-verified: `--hull` moves between `#0c0e15` and `#e8e5dd`
+   and the choice persists.
+2. **D40 - reconnect took up to thirty seconds.** Backoff was capped at 30s, which is longer
+   than a whole phase in this game, so a client that lost the keeper briefly sat on
+   RECONNECTING well after the server was answering again. Capped at five seconds with
+   jitter, plus a visibility and online listener that retries immediately. Re-verified by
+   killing the keeper for twenty seconds: recovery was immediate with no reload.
+3. **Fresh-clone build gap.** The Cairo artifacts and the Prisma client are generated and
+   correctly gitignored, so the harnesses failed on a missing file in a fresh clone. Added
+   `pnpm setup` and documented it.
+
+### Not fully verified
+
+- **D26 cutscenes.** Meeting and body-reported were both observed firing over a live match.
+  Ejection and settle were not caught in the act during this run, so the item is recorded as
+  partially observed rather than passed.
+- **Sepolia S9 `abort_match`.** Fails with an account-level `Result::unwrap failed` while the
+  same call succeeds on devnet. Traced as far as: the panic never reaches the game contract,
+  and the contract contains no `unwrap`. Recorded as failing rather than explained away.
