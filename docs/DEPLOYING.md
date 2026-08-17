@@ -76,3 +76,35 @@ the STRK20 pool.
 
 The three qualifying hashes come out of one match: a seat purchase, a ballot, and a claim —
 all three are pool invocations against the CrewKill anonymizer.
+
+
+## Mainnet
+
+Mainnet is irreversible and spends real money, so there is a read-only preflight between you
+and it. It never signs anything.
+
+```bash
+NETWORK=mainnet pnpm --filter @crewkill/keeper exec tsx scripts/preflight-mainnet.ts
+```
+
+It checks the chain is SN_MAIN, that the STRK20 pool and STRK token are really deployed at
+the addresses in the config, that the contracts are built, that the deployer exists and holds
+enough to cover a declare plus the deploys, and whether the privacy SDK credentials are set.
+
+It refuses to pass on an estimate it could not make. If the gas price cannot be read, the
+balance check blocks rather than comparing zero against zero and waving the deploy through.
+
+Order of operations:
+
+1. `NETWORK=mainnet pnpm --filter @crewkill/keeper exec tsx scripts/new-account.ts` prints a
+   fundable address. The key lands in `.env.mainnet`, gitignored, mode 600.
+2. Fund it. The declare alone is the dominant cost; the preflight prints the current number.
+3. `NETWORK=mainnet pnpm --filter @crewkill/keeper exec tsx scripts/deploy-account.ts`
+4. Re-run the preflight. It should report ready.
+5. `NETWORK=mainnet pnpm --filter @crewkill/keeper deploy:contracts`
+6. Put the resulting addresses and three pool transaction hashes into `strk20.json`.
+
+House agents will not run on mainnet without `PROVING_SERVICE_URL`, `INDEXER_URL` and
+`AGENT_VIEWING_KEY`. The contracts deploy and humans can play; seats simply will not
+auto-fill. The preflight reports this as a warning rather than a blocker, because it is a
+real limitation and not a reason to refuse to deploy.
