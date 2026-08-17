@@ -134,6 +134,32 @@ persistence, **F** honestly untestable here.
 | E7 | Sepolia live | Contracts respond on Sepolia through the configured RPC |
 | E8 | Sepolia writes | A real signed transaction lands and reads back |
 
+## G. molfi.fun hub (`apps/hub`)
+
+The hub was added after the first plan was written and had no coverage at all. It is a
+separate app on its own port with its own visual system, so it needs its own section rather
+than being folded into the client's.
+
+| # | Item | Correct means |
+| --- | --- | --- |
+| G1 | `/` renders | 200, every section present: hero, tagline, games, how it works, what stays public, FAQ, final call, footer |
+| G2 | `/privacy` | 200, describes what the software actually does, not boilerplate |
+| G3 | `/terms` | 200, states that these are wagered games and settlement is by contract |
+| G4 | Unknown route | 404 status, page reads "Nothing at this table", offers a way back, and the tab title says the page was not found rather than inheriting the home title |
+| G5 | Favicon | `/favicon.svg` serves 200 |
+| G6 | Social metadata | `og:title`, `og:description`, `og:url`, `og:type` all present in served HTML |
+| G7 | Typeface | Geist actually loads; no fallback to a system font |
+| G8 | No content is ever invisible | Every reveal block computes to opacity 1 without any scrolling |
+| G9 | Tagline reveal | All words reach full colour; none are left muted |
+| G10 | Game links | Both point at the real subdomains, and neither is a dead "soon" label while the game is open |
+| G11 | Outbound links resolve | Every `href` in the footer and nav points at a route or origin that exists |
+| G12 | Console clean | No errors or warnings on any hub route |
+| G13 | Network clean | No failed requests on any hub route |
+| G14 | Narrow viewport | No horizontal overflow at 380px on every hub route |
+| G15 | Skip link | Present, reaches `#main`, and becomes visible on focus |
+| G16 | Semantic landmarks | `nav`, `main`, `footer` and `section` present, one `h1` only |
+| G17 | Reduced motion | A `prefers-reduced-motion` rule exists and disables the reveals |
+
 ## F. Not testable here
 
 | # | Item | Why |
@@ -183,3 +209,34 @@ driven through a real browser. Sepolia items run against the live deployment.
 - **Sepolia S9 `abort_match`.** Fails with an account-level `Result::unwrap failed` while the
   same call succeeds on devnet. Traced as far as: the panic never reaches the game contract,
   and the contract contains no `unwrap`. Recorded as failing rather than explained away.
+
+
+## Execution record: hub section G
+
+Run against the hub on `:3200` through a real browser, alongside the existing sections.
+
+| Section | Result |
+| --- | --- |
+| G molfi.fun hub | **17/17** |
+
+### Failure found and fixed
+
+**G4.** The 404 page rendered correctly but its `<title>` inherited the home page's, so a
+lost visitor saw "molfi.fun — staked games settled on Starknet" in the tab while looking at
+a not-found page. Both apps now title their 404 explicitly. Re-verified in the served HTML:
+`Page not found — molfi.fun` and `Page not found — CrewKill`.
+
+### A test error worth recording
+
+G4 first reported a failure that was mine, not the product's: the assertion checked for
+CrewKill's 404 copy while testing the hub, which uses different wording. The plan row now
+pins the exact string so the check cannot drift from the page again. The page had been
+correct the whole time.
+
+### Verified across every hub route
+
+Routes and status codes, favicon, open graph tags, Geist actually loading rather than
+falling back, no content left invisible, every tagline word reaching full colour, both game
+links pointing at real subdomains, semantic landmarks with a single `h1`, the skip link
+reaching `#main`, a reduced-motion rule present, no horizontal overflow at 380px, and a
+clean console and network on `/`, `/privacy`, `/terms` and the 404.

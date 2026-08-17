@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+// A 404 should say so in the tab, not inherit the home page title.
+export const metadata = { title: "Page not found — CrewKill" };
+
 /**
  * A branded 404 with a way back, rather than the framework's default.
  */
