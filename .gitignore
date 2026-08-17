@@ -10,3 +10,6 @@ apps/keeper/devnet-accounts.json
 
 # Design skills installed for the redesign run. Vendored tooling, not project source.
 .agents/
+
+# Vendored context, refetched with `curl -sL https://strk20-by-example.org/llms-full.txt`
+docs/strk20-reference.txt
