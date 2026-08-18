@@ -73,6 +73,8 @@ interface RuntimeMatch {
   onchainId: number;
   operatorSeed: bigint;
   world: World | null;
+  /** True once we have announced that the room is waiting, so it is said once, not every tick. */
+  heldOnce?: boolean;
   agents: Map<
     number,
     {
@@ -286,7 +288,22 @@ export class Engine {
 
     switch (fresh.phase) {
       case MatchPhase.Lobby:
-        if (expired) await this.closeLobby(state, fresh.seatCount, fresh.seatsFilled);
+        if (expired) {
+          // Never start a match nobody joined.
+          //
+          // The lobby used to fill every empty seat with house agents the moment the clock
+          // ran out, so an empty room became six agents playing a full game to an audience
+          // of nobody. That is a screensaver, not a game, and it also meant a visitor
+          // arriving mid-match could only ever spectate something already in progress.
+          //
+          // Agents exist to round out a game for a real player, not to play games in their
+          // absence. With nobody seated the lobby simply stays open and waits.
+          if (fresh.seatsFilled === 0) {
+            await this.holdLobby(state);
+          } else {
+            await this.closeLobby(state, fresh.seatCount, fresh.seatsFilled);
+          }
+        }
         break;
       case MatchPhase.Playing:
         await this.runRound(state, expired);
@@ -307,6 +324,31 @@ export class Engine {
    * match runs on schedule regardless of turnout, so a player who does show up is never
    * left waiting in an empty room for people who are not coming.
    */
+  /**
+   * Keeps an unjoined lobby open instead of starting it.
+   *
+   * The deadline is pushed out rather than removed, so the countdown on screen keeps
+   * meaning something: it is the wait until agents would fill in, and it restarts each time
+   * it lapses with the room still empty.
+   */
+  private async holdLobby(state: RuntimeMatch): Promise<void> {
+    await prisma.match.update({
+      where: { id: state.dbId },
+      data: { phaseEndsAt: new Date(Date.now() + PHASE_SECONDS.lobby * 1000) },
+    });
+    if (!state.heldOnce) {
+      state.heldOnce = true;
+      await this.event(
+        state.dbId,
+        0,
+        "lobby_waiting",
+        "Waiting for a player. House agents fill the remaining seats once somebody takes one.",
+      );
+      log.info({ matchId: state.onchainId }, "lobby held open, nobody seated");
+    }
+    this.deps.broadcast(state.dbId);
+  }
+
   private async closeLobby(
     state: RuntimeMatch,
     seatCount: number,

@@ -76,6 +76,15 @@ export function MainMenu({
           {lobby ? (openSeats > 0 ? "Take a seat" : "Watch the match") : "Waiting for a lobby"}
         </button>
 
+        {/* An empty room is waiting for a person, not counting down to a game that starts
+            without one. Saying so is the difference between a lobby and a screensaver. */}
+        {lobby && lobby.seatsFilled === 0 && (
+          <p className="mt-4 max-w-md text-[12px] leading-relaxed text-[var(--color-amber)]">
+            Nobody has taken a seat yet. Nothing starts until somebody does, and the house
+            agents only fill the rest of the table once you are in it.
+          </p>
+        )}
+
         <p className="mt-4 max-w-md text-[12px] leading-relaxed text-[var(--color-dim)]">
           Your seat is a commitment, never an address. Your role is drawn from a seed nobody
           could steer. Your ballot is a hash until the match is over.
