@@ -3,7 +3,7 @@ import { Field as createField } from '@noble/curves/abstract/modular';
 import { sha256 } from '@noble/hashes/sha256';
 import { hmac } from '@noble/hashes/hmac';
 import { concatBytes, randomBytes } from '@noble/hashes/utils';
-import type { Point } from '../types';
+import type { Point } from '../types.js';
 
 // Grumpkin curve: y² = x³ - 17 over BN254 scalar field
 // This is Noir's native embedded curve

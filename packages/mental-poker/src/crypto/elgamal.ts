@@ -7,8 +7,8 @@ import {
   fromPoint,
   randomScalar,
   type ProjectivePoint,
-} from './grumpkin';
-import type { Point, EncryptedCard, KeyPair } from '../types';
+} from './grumpkin.js';
+import type { Point, EncryptedCard, KeyPair } from '../types.js';
 
 /**
  * Generate a new key pair: sk random in [1, n-1], pk = sk * G.

@@ -1,30 +1,17 @@
-/**
- * Mental poker: dealing cards with no dealer.
- *
- * Ported from the mental-poker reference in `_references/`, which built it for the Starknet
- * privacy track. Only the cryptography came across. The reference also proves its shuffles
- * in Noir and verifies them on-chain through Garaga, and that layer is not here yet, so what
- * this package gives you is the encryption and the threshold reveal, not a proof that a
- * shuffle was honest.
- *
- * The property that matters: a card is encrypted to an aggregate key that no single player
- * holds. Opening it needs a reveal token from every player. One player alone, including
- * whoever runs the table, learns nothing.
- */
+// Types
+export type {
+  Point,
+  EncryptedCard,
+  KeyPair,
+  ProofWithPublicInputs,
+  GameState,
+  SDKConfig,
+} from './types.js';
 
-export {
-  GRUMPKIN_N,
-  G,
-  ZERO,
-  scalarMul,
-  fixedBaseMul,
-  toPoint,
-  fromPoint,
-  randomScalar,
-  mod,
-  type ProjectivePoint,
-} from "./crypto/grumpkin";
+// High-level SDK
+export { MentalPokerSDK } from './mental-poker-sdk.js';
 
+// Crypto layer
 export {
   generateKeyPair,
   privToPubKey,
@@ -36,6 +23,39 @@ export {
   encryptDeck,
   buildCardTable,
   lookupCard,
-} from "./crypto/elgamal";
+  shuffleAndRemask,
+  randomPermutation,
+} from './crypto/elgamal.js';
 
-export type { Point, EncryptedCard, KeyPair } from "./types";
+// Grumpkin curve primitives
+export {
+  grumpkin,
+  G,
+  ZERO,
+  GRUMPKIN_P,
+  GRUMPKIN_N,
+  fixedBaseMul,
+  scalarMul,
+  toPoint,
+  fromPoint,
+  randomScalar,
+} from './crypto/grumpkin.js';
+
+// Proof generation
+export { MentalPokerProver } from './proof/prover.js';
+export { proofToCalldata, flattenFieldsAsArray } from './proof/calldata.js';
+
+// Contract wrappers
+export { MentalPokerContract } from './contract/mental-poker.js';
+export { TexasHoldemContract } from './contract/texas-holdem.js';
+
+// Poker SDK
+export { TexasHoldemSDK } from './texas-holdem-sdk.js';
+
+// Poker types
+export type { TableConfig, PokerHandResult } from './types.js';
+export { PokerPhase, PlayerAction, HandRank } from './types.js';
+
+// Poker utilities
+export { cardToRankSuit, cardName, handDescription } from './poker/card-mapping.js';
+export type { CardInfo } from './poker/card-mapping.js';

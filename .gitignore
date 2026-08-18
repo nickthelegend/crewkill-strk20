@@ -16,3 +16,6 @@ docs/strk20-reference.txt
 
 # Impeccable design tooling, vendored.
 .claude/skills/impeccable/
+
+# Vite build output for the poker app.
+apps/poker/dist/
