@@ -160,6 +160,30 @@ than being folded into the client's.
 | G16 | Semantic landmarks | `nav`, `main`, `footer` and `section` present, one `h1` only |
 | G17 | Reduced motion | A `prefers-reduced-motion` rule exists and disables the reveals |
 
+## H. Poker (`apps/poker`)
+
+The mental poker client, ported whole from the reference. It is a Vite app on its own port
+talking to its own Starknet contracts, so it gets its own section rather than being folded
+into CrewKill's.
+
+| # | Item | Correct means |
+| --- | --- | --- |
+| H1 | Lobby renders | 200, Create Room and Join Game both present |
+| H2 | Table options | Player counts 2P/3P/4P, buy ins 1k/5k/20k/custom, blinds shown |
+| H3 | Proving artifacts | Noir artifacts load; the app reports them ready rather than erroring |
+| H4 | Wallet control present | On a real network the Cartridge connect control is visible |
+| H5 | Actions gated on connection | Create Table and Join Table are disabled until a wallet is connected |
+| H6 | Contract is live | The configured Texas Hold'em address returns a class hash on Sepolia |
+| H7 | Verifiers are live | All three Garaga verifiers return a class hash on Sepolia |
+| H8 | Network config honoured | `VITE_NETWORK=sepolia` stops the devnet badge appearing and switches to wallet mode |
+| H9 | No secrets committed | `.env` is ignored; `.env.example` carries no live key |
+| H10 | Console clean | No errors or warnings on the lobby |
+| H11 | Network clean | No failed requests on the lobby |
+| H12 | Narrow viewport | No horizontal overflow at 380px |
+| H13 | Join validation | A malformed table id is rejected rather than submitted |
+| H14 | Create a table | **Untestable here.** Needs a funded Sepolia wallet and a real signature through Cartridge |
+| H15 | Play a hand | **Untestable here.** Needs two connected wallets |
+
 ## F. Not testable here
 
 | # | Item | Why |
@@ -240,3 +264,37 @@ falling back, no content left invisible, every tagline word reaching full colour
 links pointing at real subdomains, semantic landmarks with a single `h1`, the skip link
 reaching `#main`, a reduced-motion rule present, no horizontal overflow at 380px, and a
 clean console and network on `/`, `/privacy`, `/terms` and the 404.
+
+
+## Execution record: poker section H
+
+Run against the poker client on `:3300`, pointed at its live Sepolia contracts.
+
+| Section | Result |
+| --- | --- |
+| H poker | **13/13 testable**, 2 untestable without a funded wallet |
+
+### Failure found and fixed
+
+**H13.** The join field was plain text and accepted `not-a-number`. The Join button happened
+to be disabled at the time, but only because no wallet was connected, so once someone
+connected a malformed id would have gone to the contract and come back as an error instead of
+an answer. The field now keeps digits only, carries `inputMode="numeric"`, and the button
+waits for a real id rather than any non empty string. Re-verified: garbage is rejected
+outright, `4a2b` becomes `42`, and a valid id is accepted.
+
+### Untestable here, not marked pass
+
+**H14 create a table** and **H15 play a hand** both need a funded Sepolia wallet signing
+through Cartridge. That is a real credential I do not have, so the create and deal path is
+unverified end to end. Everything up to the signature is verified: the control is present,
+correctly gated, and pointed at a contract confirmed live on chain.
+
+### A deliberate deviation from the detector
+
+The anti-pattern detector flags `text-purple-400` on one heading in the ported lobby as an
+AI palette tell. It is not one here: purple is Mental Poker's own brand, used fifteen times
+across the client, and the logo is violet. The instruction to port the reference faithfully
+is the stronger one, so the palette stays as the reference designed it. Recorded here rather
+than suppressed in the tooling, so the next person sees the choice and the reason instead of
+a clean report that hides it.

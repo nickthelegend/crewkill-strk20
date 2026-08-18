@@ -101,8 +101,8 @@ export function LobbyScreen({
   };
 
   const handleJoin = () => {
-    if (!canAct || !joinGameId.trim()) return;
-    onJoinGame(joinGameId.trim());
+    if (!canAct || !/^\d+$/.test(joinGameId)) return;
+    onJoinGame(joinGameId);
   };
 
   const handleCopyGameId = () => {
@@ -387,7 +387,9 @@ export function LobbyScreen({
                     <input
                       type="text"
                       value={joinGameId}
-                      onChange={e => setJoinGameId(e.target.value)}
+                      onChange={e => setJoinGameId(e.target.value.replace(/\D/g, ''))}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       onKeyDown={e => e.key === 'Enter' && handleJoin()}
                       placeholder="e.g. 42"
                       className="w-full px-4 py-3.5 bg-black/40 border border-white/10 rounded-xl text-lg text-white/70 placeholder-white/20 font-mono text-center focus:outline-none focus:border-purple-500/40 transition-colors"
@@ -403,7 +405,7 @@ export function LobbyScreen({
 
                   <button
                     onClick={handleJoin}
-                    disabled={!canAct || !joinGameId.trim()}
+                    disabled={!canAct || !/^\d+$/.test(joinGameId)}
                     className="w-full py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider transition-all disabled:opacity-30 disabled:cursor-not-allowed
                       bg-purple-600/25 border border-purple-500/50 text-purple-400 hover:bg-purple-600/35 hover:border-purple-400/70 active:scale-[0.98]
                       shadow-[0_0_20px_rgba(168,85,247,0.1)]"
