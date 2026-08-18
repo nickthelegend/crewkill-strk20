@@ -1,0 +1,22 @@
+{
+  "name": "@molfi/poker",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev -p 3300",
+    "build": "next build",
+    "start": "next start -p 3300"
+  },
+  "dependencies": {
+    "@molfi/mental-poker": "workspace:*",
+    "next": "15.5.23",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}

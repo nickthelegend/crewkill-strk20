@@ -16,7 +16,19 @@ Roughly 82,000 lines. The parts that matter:
 | `sdk/src/texas-holdem-sdk.ts` | The game layer on top of the protocol |
 | `examples/poker-multiplayer/` | Vite + React client |
 
-### The one thing genuinely worth taking
+### Ported: the threshold cryptography
+
+`packages/mental-poker` carries the Grumpkin curve operations and the threshold ElGamal
+across verbatim, with eight tests written to break the claim rather than demonstrate it: a
+single player acting alone, a missing token, a substituted key, and remasking as a shuffle
+would. `apps/poker` runs it live in the browser.
+
+What did not come across is the proving layer. The reference proves its shuffles in Noir and
+verifies them on-chain through Garaga. Without that, the reveal is real and the shuffle is
+unproved, and the poker page says exactly that rather than letting a visitor assume
+otherwise.
+
+### Still worth taking, not yet taken
 
 CrewKill's README names its own worst weakness:
 
