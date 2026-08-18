@@ -19,3 +19,5 @@ docs/strk20-reference.txt
 
 # Vite build output for the poker app.
 apps/poker/dist/
+
+apps/poker/.env
